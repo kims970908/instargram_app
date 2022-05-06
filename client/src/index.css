@@ -36,3 +36,6 @@ code {
 
 /* ----------AUTH CSS 추가----------- */
 @import url(./styles/auth.css);
+
+/* ----------LOADING CSS 추가----------- */
+@import url(./styles/loading.css);

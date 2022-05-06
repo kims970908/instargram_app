@@ -1,27 +1,33 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
 import { login } from "../redux/actions/authAction";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const Login = () => {
   const initialState = { email: "", password: "" };
-  const [userDate, setUserDate] = useState(initialState);
-  const { email, password } = userDate;
+  const [userData, setUserData] = useState(initialState);
+  const { email, password } = userData;
 
-  const [typePass, setTypePass] = useState(false)
+  const [typePass, setTypePass] = useState(false);
 
+  const { auth } = useSelector((state) => state);
   const dispatch = useDispatch();
+  const history = useHistory();
+
+  useEffect(() => {
+    if (auth.token) history.push("/")
+  }, [auth.token, history]);
 
   const handleChangeInput = (e) => {
     const { name, value } = e.target;
-    setUserDate({ ...userDate, [name]: value });
+    setUserData({ ...userData, [name]: value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(login(userDate));
-    console.log(userDate);
+    dispatch(login(userData));
   };
+
   return (
     <div className="auth_page">
       <form onSubmit={handleSubmit}>
@@ -38,15 +44,12 @@ const Login = () => {
             value={email}
             name="email"
           />
-          {/* <small id="emailHelp" className="form-text text-muted">
-            email
-          </small> */}
         </div>
         <div className="form-group">
           <label htmlFor="exampleInputPassword1">Password</label>
           <div className="pass">
             <input
-              type={typePass ? "text" :"password"}
+              type={typePass ? "text" : "password"}
               className="form-control"
               id="exampleInputPassword1"
               placeholder="비밀번호"
@@ -54,7 +57,11 @@ const Login = () => {
               value={password}
               name="password"
             />
-            <small onClick={()=>{setTypePass(!typePass)}}>
+            <small
+              onClick={() => {
+                setTypePass(!typePass);
+              }}
+            >
               {typePass ? "Hide" : "Show"}
             </small>
           </div>
@@ -67,7 +74,8 @@ const Login = () => {
           로그인
         </button>
         <p className="my-2 text-center">
-          <Link to="/register" style={{ color: "crimson" }}>
+          회원가입 하시겠습니까?{" "}
+          <Link to ="/register" style={{ color: "crimson" }}>
             회원가입
           </Link>
         </p>
