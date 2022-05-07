@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory, Link } from "react-router-dom";
+import { register } from "../redux/actions/authAction";
 
 const Register = () => {
-  const { auth } = useSelector((state) => state);
+  const { auth, alert } = useSelector((state) => state);
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -32,7 +33,7 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(Register(userData));
+    dispatch(register(userData));
   };
 
   return (
@@ -86,7 +87,7 @@ const Register = () => {
             style={{ background: `${alert.email ? "#fd2d6a14" : ""}` }}
           />
 
-          <small className="form-text text-danger">
+          <small className="form-text text-danger"> 
             {alert.email ? alert.email : ""}
           </small>
         </div>
@@ -139,7 +140,7 @@ const Register = () => {
           </small>
         </div>
 
-        <div className="row justify-content-between mx-0 mb-1">
+        <div className="row justify-content-around mx-0 mb-1">
           <label htmlFor="male">
             남성:{" "}
             <input
@@ -162,17 +163,6 @@ const Register = () => {
               onChange={handleChangeInput}
             />
           </label>
-
-          <label htmlFor="other">
-            Other:{" "}
-            <input
-              type="radio"
-              id="other"
-              name="gender"
-              value="other"
-              onChange={handleChangeInput}
-            />
-          </label>
         </div>
 
         <button type="submit" className="btn btn-dark w-100">
@@ -180,7 +170,6 @@ const Register = () => {
         </button>
 
         <p className="my-2 text-center">
-          동의하시겠습니까?{" "}
           <Link to="/" style={{ color: "crimson" }}>
             로그인하러가기
           </Link>
