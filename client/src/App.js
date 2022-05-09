@@ -26,24 +26,22 @@ function App() {
   }, [dispatch]);
 
   return (
-    <>
-      <BrowserRouter>
-        <Router>
-          <Alert />
+    <BrowserRouter>
+      <Router>
+        <Alert />
 
-          <input type="checkbox" id="theme" />
-          <div className="App">
-            <div className="main">
-              {auth.token && <Header />}
-              <Route exact path="/" component={auth.token ? Home : Login} />
+        <input type="checkbox" id="theme" />
+        <div className="App">
+          <div className="main">
+            {auth.token && <Header />}
+            <Route exact path="/" component={auth.token ? Home : Login} />
 
-              <Route exact path="/:page" component={PageRender} />
-              <Route exact path="/:page/:id" component={PageRender} />
-            </div>
+            <Route exact path="/:page" component={PageRender} />
+            <Route exact path="/:page/:id" component={PageRender} />
           </div>
-        </Router>
-      </BrowserRouter>
-    </>
+        </div>
+      </Router>
+    </BrowserRouter>
   );
 }
 

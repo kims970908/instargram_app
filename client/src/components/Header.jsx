@@ -2,7 +2,8 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { logout } from "../redux/actions/authAction";
-import { GLOBALTYPES } from '../redux/actions/globalTypes'
+import { GLOBALTYPES } from "../redux/actions/globalTypes";
+import Avatar from "../components/Avatar";
 
 const Header = () => {
   const navLinks = [
@@ -56,19 +57,19 @@ const Header = () => {
               aria-haspopup="true"
               aria-expanded="false"
             >
-              <img
-                src={auth.user.avatar}
-                alt="avatar"
-                className="avatar"
-                style={{ filter: `${theme ? "invert(1)" : "invert(0)"}` }}
-              />
+              <Avatar src={auth.user.avatar} theme={theme} />
             </span>
             <div className="dropdown-menu" aria-labelledby="navbarDropdown">
               <Link className="dropdown-item" to={`/profile/${auth.user_id}`}>
                 프로필
               </Link>
-              <label className="dropdown-item" htmlFor="theme"
-              onClick={()=>dispatch({type: GLOBALTYPES.THEME, payload: !theme})}>
+              <label
+                className="dropdown-item"
+                htmlFor="theme"
+                onClick={() =>
+                  dispatch({ type: GLOBALTYPES.THEME, payload: !theme })
+                }
+              >
                 {theme ? "Light mode" : "Dark mode"}
               </label>
               <div className="dropdown-divider"></div>

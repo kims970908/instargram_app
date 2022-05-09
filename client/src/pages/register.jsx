@@ -170,8 +170,8 @@ const Register = () => {
         </button>
 
         <p className="my-2 text-center">
-          <Link to="/" style={{ color: "crimson" }}>
-            로그인하러가기
+          <Link to="/" style={{ color: "crimson" , fontSize:"18px"}}>
+            취소
           </Link>
         </p>
       </form>
