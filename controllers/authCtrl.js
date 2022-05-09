@@ -8,6 +8,15 @@ const authCtrl = {
     try {
       const { fullname, username, email, password, gender } = req.body;
       let newUserName = username.toLowerCase().replace(/ /g, "");
+      let newfullname = fullname.toLowerCase().replace(/ /g, "");
+
+      const user_fullname = await Users.findOne({
+        fullname: newfullname,
+      });
+      if (user_fullname)
+        return res.status(400).json({
+          msg: "이미 존재하는 이름 입니다.",
+        });
 
       //username중복확인
       const user_name = await Users.findOne({
@@ -15,7 +24,7 @@ const authCtrl = {
       });
       if (user_name)
         return res.status(400).json({
-          msg: "이미 존재하는 이름 입니다.",
+          msg: "이미 존재하는 아이디 입니다.",
         });
 
       //email중복확인

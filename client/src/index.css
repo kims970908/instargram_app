@@ -34,8 +34,21 @@ code {
   margin:auto;
 }
 
+img{
+  object-fit: cover
+}
+
+.avatar{
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
 /* ----------AUTH CSS 추가----------- */
 @import url(./styles/auth.css);
 
 /* ----------LOADING CSS 추가----------- */
 @import url(./styles/loading.css);
+
+/* ----------HEADER CSS 추가----------- */
+@import url(./styles/header.css)
