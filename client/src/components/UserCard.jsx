@@ -1,16 +1,26 @@
-import React from 'react'
-import Avatar from './Avatar'
+import React from "react";
+import Avatar from "./Avatar";
+import { Link } from "react-router-dom";
 
-const UserCard = ({user, bold, border}) => {
+const UserCard = ({ user, bold, border, handleClose }) => {
+  const handleCloseAll = ()=>{
+    if(handleClose) handleClose()
+  }
   return (
-     <div className={`d-flex p-2 align-item-center font-weight-${bold} ${border}`}>
-      <Avatar src={user.avatar} size="big-avatar" />
-      <div className="ml-1" style={{transform: 'translateY(-2px)'}}>
-        <span className='d-block'>{user.username}</span>
-        <small style={{opacity:.7}}>{user.fullname}</small>
+    <div
+      className={`d-flex p-2 align-item-center font-weight-${bold} ${border}`}
+    >
+      <div>
+        <Link to={`/profile/${user._id}`} onClick={handleCloseAll} className="d-flex align-item-center">
+          <Avatar src={user.avatar} size="big-avatar" />
+          <div className="ml-1" style={{ transform: "translateY(-2px)" }}>
+            <span className="d-block">{user.username}</span>
+            <small style={{ opacity: 0.7 }}>{user.fullname}</small>
+          </div>
+        </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default UserCard
+export default UserCard;

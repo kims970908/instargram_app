@@ -45,7 +45,7 @@ const Menu = () => {
             <Avatar src={auth.user.avatar} size="medium-avatar" />
           </span>
           <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-            <Link className="dropdown-item" to={`/profile/${auth.user_id}`}>
+            <Link className="dropdown-item" to={`/profile/${auth.user._id}`}>
               프로필
             </Link>
             <label

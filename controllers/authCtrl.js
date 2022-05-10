@@ -123,7 +123,7 @@ const authCtrl = {
       res.cookie("refreshtoken", refresh_token, {
         httpOnly: true,
         path: "/api/refresh_token",
-        maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
       res.json({
@@ -162,29 +162,26 @@ const authCtrl = {
   generateAccessToken: async (req, res) => {
     try {
       const rf_token = req.cookies.refreshtoken;
-      if (!rf_token)
-        return res.status(400).json({
-          msg: "로그인을 해야합니다",
-        });
+      if (!rf_token) return res.status(400).json({ msg: "로그인을 해주세요" });
 
       jwt.verify(
         rf_token,
         process.env.REFRESH_TOKEN_SECRET,
         async (err, result) => {
-          console.log(result);
+          if (err) return res.status(400).json({ msg: "로그인을 해주세요" });
 
           const user = await Users.findById(result.id)
             .select("-password")
-            .populate("followers following", "-password");
+            .populate(
+              "followers following",
+              "avatar username fullname followers following"
+            );
 
           if (!user)
-            return res.status(400).json({
-              msg: "사용자를 찾을수 없습니다",
-            });
+            return res.status(400).json({ msg: "존재하지 않는 사용자 입니다" });
 
-          const access_token = createAccessToken({
-            id: result.id,
-          });
+          const access_token = createAccessToken({ id: result.id });
+
           res.json({
             access_token,
             user,
@@ -192,9 +189,7 @@ const authCtrl = {
         }
       );
     } catch (err) {
-      return res.status(500).json({
-        msg: err.message,
-      });
+      return res.status(500).json({ msg: err.message });
     }
   },
 };
