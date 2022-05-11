@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+
 import Avatar from "../Avatar";
+import EditProfile from "./EditProfile";
+import FollowBtn from "../FollowBtn";
+
 import { getProfileUsers } from "../../redux/actions/profileAction";
 
 const Info = () => {
@@ -10,6 +14,7 @@ const Info = () => {
   const dispatch = useDispatch();
 
   const [userData, setUserData] = useState([]);
+  const [onEdit, setOnEdit] = useState(false);
 
   useEffect(() => {
     if (id === auth.user._id) {
@@ -29,7 +34,16 @@ const Info = () => {
           <div className="info_content">
             <div className="info_content_title">
               <h2>{user.username}</h2>
-              <button className="btn btn-outline-info">Edit Profile</button>
+              {user._id === auth.user._id ? (
+                <button
+                  className="btn btn-outline-info"
+                  onClick={() => setOnEdit(true)}
+                >
+                  프로필 작성
+                </button>
+              ) : (
+                <FollowBtn />
+              )}
             </div>
             <div className="follow_btn">
               <span className="mr-4">{user.followers.length} 팔로워</span>
@@ -37,15 +51,16 @@ const Info = () => {
             </div>
 
             <h6 className="mt-2">
-              {user.fullname} {user.mobile}
+              {user.fullname} <span className="text-info">{user.mobile}</span>
             </h6>
             <p className="m-0">{user.address}</p>
-            <h6>{user.email}</h6>
+            <h6 className="m-0">{user.email}</h6>
             <a href={user.website} target="_blank" rel="noreferrer">
               {user.website}
             </a>
             <p>{user.story}</p>
           </div>
+          {onEdit && <EditProfile setOnEdit={setOnEdit} />}
         </div>
       ))}
     </div>
