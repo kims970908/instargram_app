@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { GLOBALTYPES } from "../redux/actions/globalTypes";
+import { createPost } from "../redux/actions/postAction";
 
 const StatusModal = () => {
-  const { auth, theme, state } = useSelector((state) => state);
+  const { auth, theme, status } = useSelector((state) => state);
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
@@ -40,42 +41,58 @@ const StatusModal = () => {
     setImages(newArr);
   };
 
-  //
   const handleStream = () => {
     setStream(true);
-    navigator.getWebcam =
-      navigator.getUserMedia ||
-      navigator.webKitGetUserMedia ||
-      navigator.moxGetUserMedia ||
-      navigator.mozGetUserMedia ||
-      navigator.msGetUserMedia;
-    if (navigator.mediaDevices.getUserMedia) {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
-        .getUserMedia({ audio: true, video: true })
-        .then(function (stream) {
-          //Display the video stream in the video object
+        .getUserMedia({ video: true })
+        .then((mediaStream) => {
+          videoRef.current.srcObject = mediaStream;
+          videoRef.current.play();
+
+          const track = mediaStream.getTracks();
+          setTracks(track[0]);
         })
-        .catch(function (e) {
-          console.log(e.name + ": " + e.message);
-        });
-    } else {
-      navigator.getWebcam(
-        { audio: true, video: true },
-        function (stream) {
-          //Display the video stream in the video object
-        },
-        function () {
-          console.log("Web cam is not accessible.");
-        }
-      );
+        .catch((err) => console.log(err));
     }
   };
 
-  const handleCapture = () => {};
+  const handleCapture = () => {
+    const width = videoRef.current.clientWidth;
+    const height = videoRef.current.clientHeight;
+
+    refCanvas.current.setAttribute("width", width);
+    refCanvas.current.setAttribute("height", height);
+
+    const ctx = refCanvas.current.getContext("2d");
+    ctx.drawImage(videoRef.current, 0, 0, width, height);
+    let URL = refCanvas.current.toDataURL();
+    setImages([...images, { camera: URL }]);
+  };
+
+  const handleStopStream = () => {
+    tracks.stop();
+    setStream(false);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // if(images.length === 0){
+    //   return dispatch({
+    //     type: GLOBALTYPES.ALERT, payload: {error : "사진을 넣어주세요"}
+    //   })
+    // }
+    dispatch(createPost({ content, images, auth }));
+
+    setContent("");
+    setImages([]);
+    if (tracks) tracks.stop();
+    dispatch({ type: GLOBALTYPES.STATUS, payload: false });
+  };
 
   return (
     <div className="status_modal">
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="status_header">
           <h5 className="m-0">게시물 작성</h5>
           <span
@@ -91,8 +108,7 @@ const StatusModal = () => {
           <textarea
             name="content"
             value={content}
-            // ${auth.user.username}
-            placeholder={`, 무슨 생각 중인가요?`}
+            placeholder={`${auth.user.fullname}님 무슨 생각 중인가요?`}
             onChange={(e) => setContent(e.target.value)}
             style={{
               filter: theme ? "invert(1)" : "invert(0)",
@@ -104,7 +120,11 @@ const StatusModal = () => {
           <div className="show_images">
             {images.map((img, index) => (
               <div key={index} id="file_img">
-                <img src={URL.createObjectURL(img)} alt="images" />
+                <img
+                  src={img.camera ? img.camera : URL.createObjectURL(img)}
+                  alt="images"
+                  className="img-thumbnail"
+                />
                 <span onClick={() => deleteImages(index)}>&times;</span>
               </div>
             ))}
@@ -121,7 +141,7 @@ const StatusModal = () => {
                 style={{ filter: theme ? "invert(1)" : "invert(0)" }}
               />
 
-              <span>&times;</span>
+              <span onClick={handleStopStream}>&times;</span>
               <canvas ref={refCanvas} style={{ display: "none" }} />
             </div>
           )}
@@ -149,7 +169,9 @@ const StatusModal = () => {
         </div>
 
         <div className="status_footer">
-          <button className="btn btn-secondary w-100">전송</button>
+          <button className="btn btn-secondary w-100" type="submit">
+            완료
+          </button>
         </div>
       </form>
     </div>
