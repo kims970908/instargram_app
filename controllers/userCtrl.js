@@ -32,7 +32,7 @@ const userCtrl = {
       const { avatar, fullname, mobile, address, story, website, gender } =
         req.body;
       if (!fullname)
-        return res.status(400).json({ msg: "Please add your full name." });
+        return res.status(400).json({ msg: "본인 이름을 넣어주세요" });
 
       await Users.findOneAndUpdate(
         { _id: req.user._id },
@@ -41,13 +41,60 @@ const userCtrl = {
           fullname,
           mobile,
           address,
-          website,
           story,
+          website,
           gender,
         }
       );
 
-      res.json({ msg: "Update Success!" });
+      res.json({ msg: "프로필 작성 완료" });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  follow: async (req, res) => {
+    try {
+      const user = await Users.find({
+        _id: req.params.id,
+        followers: req.user._id,
+      });
+      if (user.length > 0)
+        return res.status(500).json({ msg: "이미 팔로우 하고있습니다" });
+
+      await Users.findOneAndUpdate(
+        { _id: req.params.id },
+        { $push: { followers: req.user._id } },
+        { new: true }
+      ).populate("followers following", "-password");
+
+      await Users.findOneAndUpdate(
+        { _id: req.user._id },
+        {
+          $push: { following: req.params.id },
+        },
+        { new: true }
+      );
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  unfollow: async (req, res) => {
+    try {
+      const newUser = await Users.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+          $pull: { followers: req.user._id },
+        },
+        { new: true }
+      ).populate("followers following", "-password");
+
+      await Users.findOneAndUpdate(
+        { _id: req.user._id },
+        {
+          $pull: { following: req.params.id },
+        },
+        { new: true }
+      );
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

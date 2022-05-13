@@ -110,7 +110,7 @@
   }
   .header .menu .navbar-nav{
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
   }
   .header .menu .dropdown-menu {

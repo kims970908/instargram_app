@@ -24,7 +24,7 @@ const Menu = () => {
 
   return (
     <div className="menu">
-      <ul className="navbar-nav flex-row">
+      <ul className="navbar-nav flex-row ">
         {navLinks.map((link, index) => (
           <li className={`nav-item px-2 ${isActive(link.path)}`} key={index}>
             <Link className="nav-link" to={link.path}>
@@ -44,6 +44,8 @@ const Menu = () => {
           >
             <Avatar src={auth.user.avatar} size="medium-avatar" />
           </span>
+
+          {/* Drop-dowun 메뉴 */}
           <div className="dropdown-menu" aria-labelledby="navbarDropdown">
             <Link className="dropdown-item" to={`/profile/${auth.user._id}`}>
               프로필

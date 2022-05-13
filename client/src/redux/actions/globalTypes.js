@@ -2,7 +2,7 @@ export const GLOBALTYPES = {
   AUTH: "AUTH",
   ALERT: "ALERT",
   THEME: "THEME",
-  // STATUS: "STATUS",
+  STATUS: "STATUS",
   // MODAL: "MODAL",
   // SOCKET: "SOCKET",
   // ONLINE: "ONLINE",
@@ -11,12 +11,12 @@ export const GLOBALTYPES = {
   // PEER: "PEER",
 };
 
-// export const EditData = (data, id, post) => {
-//   const newData = data.map((item) => (item._id === id ? post : item));
-//   return newData;
-// };
+export const EditData = (data, id, post) => {
+  const newData = data.map((item) => (item._id === id ? post : item));
+  return newData;
+};
 
-// export const DeleteData = (data, id) => {
-//   const newData = data.filter((item) => item._id !== id);
-//   return newData;
-// };
+export const DeleteData = (data, id) => {
+  const newData = data.filter((item) => item._id !== id);
+  return newData;
+};
