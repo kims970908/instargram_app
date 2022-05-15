@@ -25,6 +25,47 @@ const postCtrl = {
       return res.status(500).json({ msg: err.message });
     }
   },
+  getPost: async (req, res) => {
+    try {
+      const posts = await Posts.find({
+        user: [...req.user.following, req.user._id],
+      })
+        .sort("-createAt")
+        .populate("user likes", "avatar username fullname");
+
+      res.json({
+        msg: "성공!",
+        result: posts.length,
+        posts,
+      });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  updatePost: async (req, res) => {
+    try {
+      const { content, images } = req.body;
+
+      const post = await Posts.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+          content,
+          images,
+        }
+      ).populate("user likes", "avatar username fullname");
+
+      res.json({
+        msg: "게시물 업데이트",
+        newPost: {
+          ...post._doc,
+          content,
+          images,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
 };
 
 module.exports = postCtrl;

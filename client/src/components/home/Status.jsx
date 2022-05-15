@@ -6,7 +6,7 @@ import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 import Avatar from "../Avatar";
 
 const Status = () => {
-  const { auth } = useSelector((state) => state);
+  const { auth, theme } = useSelector((state) => state);
   const distpatch = useDispatch();
   return (
     <div className="status my-3 d-flex">
