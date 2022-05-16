@@ -8,20 +8,14 @@ const commentSchema = new mongoose.Schema(
     },
     tag: Object,
     reply: mongoose.Types.ObjectId,
-    likes: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    user: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
-    },
-    postId: mongoose.Types.ObjectId,
-    postUserId: mongoose.Types.ObjectId,
+    likes: [{ type: mongoose.Types.ObjectId, ref: "user" }],
+    user: { type: mongoose.Types.ObjectId, ref: "user" },
+    // postId: mongoose.Types.ObjectId,
+    // postUserId: mongoose.Types.ObjectId,
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 module.exports = mongoose.model("comment", commentSchema);

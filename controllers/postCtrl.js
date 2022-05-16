@@ -31,7 +31,14 @@ const postCtrl = {
         user: [...req.user.following, req.user._id],
       })
         .sort("-createAt")
-        .populate("user likes", "avatar username fullname");
+        .populate("user likes", "avatar username fullname")
+        .populate({
+          path: "comments",
+          populate: {
+            path: "user likes",
+            select: "-password",
+          },
+        });
 
       res.json({
         msg: "성공!",
@@ -62,6 +69,48 @@ const postCtrl = {
           images,
         },
       });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  likePost: async (req, res) => {
+    try {
+      const post = await Posts.find({
+        _id: req.params.id,
+        likes: req.user._id,
+      });
+
+      if (post.length > 0)
+        return res.status(400).json({ msg: "이미 좋아요 눌렀습니다" });
+      const like = await Posts.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+          $push: { likes: req.user._id },
+        },
+        { new: true }
+      );
+
+      if (!like)
+        return res.status(400).json({ msg: "존재하지 않는 게시물 입니다" });
+      res.json({ msg: "좋아요" });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  unLikePost: async (req, res) => {
+    try {
+      const like = await Posts.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+          $pull: { likes: req.user._id },
+        },
+        { new: true }
+      );
+
+      if (!like)
+        return res.status(400).json({ msg: "존재하지 않는 게시물입니다" });
+
+      res.json({ msg: "좋아요 취소" });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

@@ -60,6 +60,15 @@ img{
 /* ----------STATUS_MODAL CSS 추가----------- */
 @import url(./status_modal.css);
 
+/* ----------COMMENT CSS 추가----------- */
+@import url(./comments.css);
+
+
+.mode{
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
 /* @media (max-width: 766px){
   .header .navbar .logo{
     display: none;
