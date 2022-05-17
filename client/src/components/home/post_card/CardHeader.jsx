@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { GLOBALTYPES } from "../../../redux/actions/globalTypes";
 
 import moment from "moment";
+import 'moment/locale/ko'
 
 const CardHeader = ({ post }) => {
   const { auth } = useSelector((state) => state);
@@ -35,7 +36,7 @@ const CardHeader = ({ post }) => {
       </div>
       <div className="nav-item dropdown">
         <span className="material-icons" id="moreLink" data-toggle="dropdown">
-          more_horiz
+          more
         </span>
 
         <div className="dropdown-menu">
