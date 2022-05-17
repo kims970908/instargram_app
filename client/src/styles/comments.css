@@ -33,9 +33,9 @@
   align-items: center;
 }
 
-.comment_card .comment_content:hover {
+/* .comment_card .comment_content:hover {
   background: #ddd;
-}
+} */
 
 .comment_card .comment_content .readMore{
   cursor: pointer;
@@ -71,4 +71,5 @@
   width: 100%;
   border: none;
   outline: none;
+  background: #eee;
 }

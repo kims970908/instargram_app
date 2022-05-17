@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Avatar from "../../Avatar";
 import LikeButton from "../../LikeButton";
 import CommentMenu from "./CommentMenu";
+import { updateComment } from "../../../redux/actions/commentAction";
 
 import moment from "moment";
 import "moment/locale/ko";
@@ -11,17 +12,26 @@ import { Link } from "react-router-dom";
 
 const CommentCard = ({ comment, post }) => {
   const { auth } = useSelector((state) => state);
+  const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
   const [readMore, setReadMore] = useState(false);
 
   const [isLike, setIsLike] = useState(false);
-
-  const dispatch = useDispatch();
+  const [onEdit, setOnEdit] = useState(false);
 
   useEffect(() => {
     setContent(comment.content);
   }, [comment]);
+
+  const handleUpdate = () => {
+    if (comment.content !== content) {
+      dispatch(updateComment({ comment, post, content, auth }));
+      setOnEdit(false);
+    } else {
+      setOnEdit(false);
+    }
+  };
 
   const styleCard = {
     opacity: comment._id ? 1 : 0.5,
@@ -41,17 +51,30 @@ const CommentCard = ({ comment, post }) => {
 
       <div className="comment_content">
         <div className="flex-fill">
-          <span>
-            {content.length < 100
-              ? content
-              : readMore
-              ? content + " "
-              : content.slice(0, 100) + "..."}
-          </span>
-          {content.length > 100 && (
-            <span className="readMore" onClick={() => setReadMore(!readMore)}>
-              {readMore ? "감추기" : "더보기"}
-            </span>
+          {onEdit ? (
+            <textarea
+              rows="5"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
+          ) : (
+            <div>
+              <span>
+                {content.length < 100
+                  ? content
+                  : readMore
+                  ? content + " "
+                  : content.slice(0, 100) + "..."}
+              </span>
+              {content.length > 100 && (
+                <span
+                  className="readMore"
+                  onClick={() => setReadMore(!readMore)}
+                >
+                  {readMore ? "감추기" : "더보기"}
+                </span>
+              )}
+            </div>
           )}
         </div>
         <div className="d-flex align-items-center mr-2">
@@ -61,7 +84,12 @@ const CommentCard = ({ comment, post }) => {
             handleUnLike={handleUnLike}
           />
 
-          <CommentMenu post={post} comment={comment} auth={auth} />
+          <CommentMenu
+            post={post}
+            comment={comment}
+            auth={auth}
+            setOnEdit={setOnEdit}
+          />
         </div>
       </div>
 
@@ -73,8 +101,21 @@ const CommentCard = ({ comment, post }) => {
         <small className="font-weight-bold mr-3">
           {comment.likes.length} 좋아요
         </small>
-
-        <small className="font-weight-bold mr-3">댓글</small>
+        {onEdit ? (
+          <>
+            <small className="font-weight-bold mr-3" onClick={handleUpdate}>
+              수정
+            </small>
+            <small
+              className="font-weight-bold mr-3"
+              onClick={(e) => setOnEdit(false)}
+            >
+              취소
+            </small>
+          </>
+        ) : (
+          <small className="font-weight-bold mr-3">댓글</small>
+        )}
       </div>
     </div>
   );

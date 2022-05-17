@@ -1,11 +1,11 @@
 import React from "react";
 
-const CommentMenu = ({ post, comment, auth }) => {
+const CommentMenu = ({ post, comment, auth, setOnEdit }) => {
   const handleRemove = () => {};
   const MenuItem = () => {
     return (
       <>
-        <div className="dropdown-item" >
+        <div className="dropdown-item" onClick={()=> setOnEdit(true)} >
           <span className="material-icons">create</span> 수정
         </div>
         <div className="dropdown-item" onClick={handleRemove}>

@@ -27,6 +27,22 @@ const commnetCtrl = {
       return res.status(500).json({ msg: err.message });
     }
   },
+  updateComment: async (req, res) => {
+    try {
+      const { content } = req.body;
+      await Comments.findOneAndUpdate(
+        {
+          _id: req.params.id,
+          user: req.user._id,
+        },
+        { content }
+      );
+
+      res.json({ msg: "수정되었습니다" });
+    } catch (err) {
+      return res.json(500).json({ msg: err.message });
+    }
+  },
 };
 
 module.exports = commnetCtrl;
