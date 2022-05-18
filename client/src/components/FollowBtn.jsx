@@ -15,27 +15,27 @@ const FollowBtn = ({ user }) => {
     if (auth.user.following.find((item) => item._id === user._id)) {
       setFollowed(true);
     }
-    return() => setFollowed(false)
+    return () => setFollowed(false);
   }, [auth.user.following, user._id]);
   // ----------------팔로우 handler------------------------------
   const handleFollow = async () => {
     if (load) return;
 
     setFollowed(true);
-    setLoad(true);    
+    setLoad(true);
     setLoad(false);
-    await dispatch(follow({ users: profile.users, user, auth }))
+    await dispatch(follow({ users: profile.users, user, auth }));
   };
-    // ----------------언팔로우 handler------------------------------
-    const handleUnFollow = async () => {
-      if (load) return;
-  
-      setFollowed(false);
-      setLoad(true);
-      setLoad(false);
-      await dispatch(unfollow({ users: profile.users, user, auth }))
-    };
-    
+  // ----------------언팔로우 handler------------------------------
+  const handleUnFollow = async () => {
+    if (load) return;
+
+    setFollowed(false);
+    setLoad(true);
+    setLoad(false);
+    await dispatch(unfollow({ users: profile.users, user, auth }));
+  };
+
   return (
     <>
       {followed ? (

@@ -3,6 +3,7 @@ import { EditData } from "../actions/globalTypes";
 
 const initialState = {
   loading: false,
+  ids: [],
   users: [],
   posts: [],
 };
@@ -32,6 +33,18 @@ const profileReducer = (state = initialState, action) => {
       return {
         ...state,
         users: EditData(state.users, action.payload._id, action.payload),
+      };
+    // ---------------Get id Reducer-----------------------------
+    case PROFILE_TYPES.GET_ID:
+      return {
+        ...state,
+        ids: [...state.ids, action.payload],
+      };
+    // ---------------Get posts Reducer-----------------------------
+    case PROFILE_TYPES.GET_POSTS:
+      return {
+        ...state,
+        posts: [...state.posts, action.payload],
       };
     // ---------------Default Reducer-----------------------------
     default:

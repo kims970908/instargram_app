@@ -4,12 +4,15 @@ const Posts = require("../models/postModel");
 const commnetCtrl = {
   createComment: async (req, res) => {
     try {
-      const { postId, content, tag, reply } = req.body;
+      const { postId, content, tag, reply, postUserId } = req.body;
+
       const newComment = new Comments({
         user: req.user._id,
         content,
         tag,
         reply,
+        postUserId,
+        postId,
       });
 
       await Posts.findOneAndUpdate(
@@ -41,6 +44,62 @@ const commnetCtrl = {
       res.json({ msg: "수정되었습니다" });
     } catch (err) {
       return res.json(500).json({ msg: err.message });
+    }
+  },
+  likeComment: async (req, res) => {
+    try {
+      const comment = await Comments.find({
+        _id: req.params.id,
+        likes: req.user._id,
+      });
+      if (comment.length > 0)
+        return res.status(400).json({ msg: "이미 좋아요를 눌렀습니다" });
+
+      await Comments.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+          $push: { likes: req.user._id },
+        },
+        { new: true }
+      );
+
+      res.json({ msg: "좋아요" });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  unLikeComment: async (req, res) => {
+    try {
+      await Comments.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+          $pull: { likes: req.user._id },
+        },
+        { new: true }
+      );
+
+      res.json({ msg: "좋아요 취소" });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  deleteComment: async (req, res) => {
+    try {
+      const comment = await Comments.findOneAndDelete({
+        _id: req.params.id,
+        $or: [{ user: req.user._id }, { postUserId: req.user._id }],
+      });
+
+      await Posts.findOneAndUpdate(
+        { _id: comment.postId },
+        {
+          $pull: { comments: req.params.id },
+        }
+      );
+
+      res.json({ msg: "삭제" });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
     }
   },
 };

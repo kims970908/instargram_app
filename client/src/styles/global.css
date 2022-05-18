@@ -9,6 +9,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+a:hover {
+  text-decoration: none;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -38,7 +42,6 @@ img{
 }
 
 
-
 /* ----------AUTH CSS 추가----------- */
 @import url(./auth.css);
 
@@ -63,6 +66,9 @@ img{
 /* ----------COMMENT CSS 추가----------- */
 @import url(./comments.css);
 
+
+/* ----------POST THUMB CSS 추가----------- */
+@import url(./post_thumb.css);
 
 .mode{
   width: 100%;

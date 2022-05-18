@@ -10,8 +10,9 @@ import {
 export const POST_TYPES = {
   CREATE_POST: "CREATE_POST",
   LOADING_POST: "LOADING_POST",
-  GET_POST: "GET_POST",
+  GET_POSTS: "GET_POSTS",
   UPDATE_POST: "UPDATE_POST",
+  GET_POST: "GET_POST",
   DELETE_POST: "DELETE_POST",
 };
 
@@ -49,10 +50,9 @@ export const getPosts = (token) => async (dispatch) => {
     const res = await getDataAPI("posts", token);
 
     dispatch({
-      type: POST_TYPES.GET_POST,
-      payload: res.data,
+      type: POST_TYPES.GET_POSTS,
+      payload: { ...res.data, page: 2 },
     });
-    // console.log(res); ==> reducer로 넘어감
 
     dispatch({ type: POST_TYPES.LOADING_POST, payload: false });
   } catch (err) {
@@ -135,6 +135,21 @@ export const unLikePost =
         type: GLOBALTYPES.ALERT,
         payload: { error: err.response.data.msg },
       });
+    }
+  };
+export const getPost =
+  ({ detailPost, id, auth }) =>
+  async (dispatch) => {
+    if (detailPost.every((post) => post._id !== id)) {
+      try {
+        const res = await getDataAPI(`post/${id}`, auth.token);
+        dispatch({ type: POST_TYPES.GET_POST, payload: res.data.post });
+      } catch (err) {
+        dispatch({
+          type: GLOBALTYPES.ALERT,
+          payload: { error: err.response.data.msg },
+        });
+      }
     }
   };
 // export const deletePost =

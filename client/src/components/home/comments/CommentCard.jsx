@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import Avatar from "../../Avatar";
 import LikeButton from "../../LikeButton";
 import CommentMenu from "./CommentMenu";
-import { updateComment } from "../../../redux/actions/commentAction";
+import InputComment from "../InputComment";
+import {
+  updateComment,
+  likeComment,
+  unLikeComment,
+} from "../../../redux/actions/commentAction";
 
 import moment from "moment";
 import "moment/locale/ko";
@@ -10,19 +15,32 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { Link } from "react-router-dom";
 
-const CommentCard = ({ comment, post }) => {
+const CommentCard = ({ children, comment, post, commentId }) => {
   const { auth } = useSelector((state) => state);
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
   const [readMore, setReadMore] = useState(false);
 
-  const [isLike, setIsLike] = useState(false);
   const [onEdit, setOnEdit] = useState(false);
+  const [isLike, setIsLike] = useState(false);
+  const [loadLike, setLoadLike] = useState(false);
+
+  const [onReply, setOnReply] = useState(false);
 
   useEffect(() => {
     setContent(comment.content);
-  }, [comment]);
+    setIsLike(false);
+    setOnReply(false);
+    if (comment.likes.find((like) => like._id === auth.user._id)) {
+      setIsLike(true);
+    }
+  }, [comment, auth.user._id]);
+
+  const styleCard = {
+    opacity: comment._id ? 1 : 0.5,
+    pointerEvents: comment._id ? "inherit" : "none",
+  };
 
   const handleUpdate = () => {
     if (comment.content !== content) {
@@ -33,14 +51,28 @@ const CommentCard = ({ comment, post }) => {
     }
   };
 
-  const styleCard = {
-    opacity: comment._id ? 1 : 0.5,
-    pointerEvents: comment._id ? "inherit" : "none",
+  const handleLike = async () => {
+    if (loadLike) return;
+    setIsLike(true);
+
+    setLoadLike(true);
+    await dispatch(likeComment({ comment, post, auth }));
+    setLoadLike(false);
   };
 
-  const handleLike = () => {};
+  const handleUnLike = async () => {
+    if (loadLike) return;
+    setIsLike(false);
 
-  const handleUnLike = () => {};
+    setLoadLike(true);
+    await dispatch(unLikeComment({ comment, post, auth }));
+    setLoadLike(false);
+  };
+
+  const handleReply = () => {
+    if (onReply) return setOnReply(false);
+    setOnReply({ ...comment, commentId });
+  };
 
   return (
     <div className="comment_card mt-2" style={styleCard}>
@@ -59,6 +91,12 @@ const CommentCard = ({ comment, post }) => {
             />
           ) : (
             <div>
+              {
+                comment.tag && comment.tag._id !== comment.user._id &&
+                <Link to={`/profile/${comment.tag._id}`} className="mr-2">
+                @{comment.tag.username}
+                </Link>
+              }
               <span>
                 {content.length < 100
                   ? content
@@ -77,6 +115,7 @@ const CommentCard = ({ comment, post }) => {
             </div>
           )}
         </div>
+
         <div className="d-flex align-items-center mr-2">
           <LikeButton
             isLike={isLike}
@@ -95,7 +134,7 @@ const CommentCard = ({ comment, post }) => {
 
       <div style={{ cursor: "pointer" }}>
         <small className="text-muted mr-3">
-          {moment(comment.createdAt).fromNow()}
+          {moment(comment.updatedAt).fromNow()}
         </small>
 
         <small className="font-weight-bold mr-3">
@@ -114,9 +153,19 @@ const CommentCard = ({ comment, post }) => {
             </small>
           </>
         ) : (
-          <small className="font-weight-bold mr-3">댓글</small>
+          <small className="font-weight-bold mr-3" onClick={handleReply}>
+            {onReply ? "취소" :  "댓글"}
+          </small>
         )}
       </div>
+      {onReply && (
+        <InputComment post={post} onReply={onReply} setOnReply={setOnReply}>
+          <Link to={`/profile/${onReply.user._id}`} className="mr-1">
+            @{onReply.user.username}
+          </Link>
+        </InputComment>
+      )}
+      {children}
     </div>
   );
 };
