@@ -1,9 +1,11 @@
 import React from "react";
 import Avatar from "../../Avatar";
 
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { GLOBALTYPES } from "../../../redux/actions/globalTypes";
+import { deletePost } from "../../../redux/actions/postAction";
+import { BASE_URL } from "../../../utils/config";
 
 import moment from "moment";
 import "moment/locale/ko";
@@ -12,14 +14,22 @@ const CardHeader = ({ post }) => {
   const { auth } = useSelector((state) => state);
   const dispatch = useDispatch();
 
-  // const handleDeletePost = () =>{
-  //   if(window.confirm('게시물을 삭제하시겠습니까?'))
-  //   dispatch(deletePost)
-  // }
+  const history = useHistory()
+
+  const handleDeletePost = () =>{
+    if(window.confirm('게시물을 삭제하시겠습니까?'))
+    dispatch(deletePost({post,auth}))
+
+    return history.push('/')
+  }
 
   const handleEditPost = () => {
     dispatch({ type: GLOBALTYPES.STATUS, payload: { ...post, onEdit: true } });
   };
+
+  const handleCopyLink = ()=>{
+    navigator.clipboard.writeText(`${BASE_URL}/post/${post._id}`)
+  }
   return (
     <div className="card_header">
       <Link to={`/profile/${post.user._id}`} className="text-dark">
@@ -48,14 +58,14 @@ const CardHeader = ({ post }) => {
                 포스터 수정
               </div>
 
-              <div className="dropdown-item">
+              <div className="dropdown-item" onClick={handleDeletePost}>
                 <span className="material-icons">delete</span>
                 포스터 삭제
               </div>
             </>
           )}
 
-          <div className="dropdown-item">
+          <div className="dropdown-item" onClick={handleCopyLink}> 
             <span className="material-icons">content_copy</span> 복사
           </div>
         </div>

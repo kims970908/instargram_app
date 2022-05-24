@@ -2,14 +2,19 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Send from "../../../images/send.svg";
 import LikeButton from "../../LikeButton";
+import ShareModal from "../../ShareModal";
+import {BASE_URL} from '../../../utils/config'
+
 import { useSelector, useDispatch } from "react-redux";
 import { likePost, unLikePost } from "../../../redux/actions/postAction";
 
 const CardFooter = ({ post }) => {
   const [isLike, setIsLike] = useState(false);
   const [loadLike, setLoadLike] = useState(false);
+  const [isShare, setIsShare] = useState(false);
+
   const dispatch = useDispatch();
-  const { auth } = useSelector((state) => state);
+  const { auth, theme } = useSelector((state) => state);
 
   const handleLike = async () => {
     if (loadLike) return;
@@ -48,7 +53,7 @@ const CardFooter = ({ post }) => {
             <i className="far fa-comment"></i>
           </Link>
 
-          <img src={Send} alt="Send" />
+          <img src={Send} alt="Send" onClick={()=> setIsShare(!isShare)} />
         </div>
 
         <i className="far fa-bookmark" />
@@ -62,6 +67,10 @@ const CardFooter = ({ post }) => {
           {post.comments.length} 댓글
         </h6>
       </div>
+      {
+        isShare &&
+        <ShareModal url={`${BASE_URL}/post/${post._id}`} theme={theme} />
+      }
     </div>
   );
 };

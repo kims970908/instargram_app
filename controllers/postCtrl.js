@@ -1,4 +1,20 @@
 const Posts = require("../models/postModel");
+const Comments = require("../models/commentModel");
+
+class APIfeatures {
+  constructor(query, queryString) {
+    this.query = query;
+    this.queryString = queryString;
+  }
+
+  paginating() {
+    const page = this.queryString.page * 1 || 1;
+    const limit = this.queryString.limit * 1 || 9;
+    const skip = (page - 1) * limit;
+    this.query = this.query.skip(skip).limit(limit);
+    return this;
+  }
+}
 
 const postCtrl = {
   createPost: async (req, res) => {
@@ -27,11 +43,16 @@ const postCtrl = {
   },
   getPosts: async (req, res) => {
     try {
-      const posts = await Posts.find({
-        user: [...req.user.following, req.user._id],
-      })
+      const features = new APIfeatures(
+        Posts.find({
+          user: [...req.user.following, req.user._id],
+        }),
+        req.query
+      ).paginating();
+
+      const posts = await features.query
         .sort("-createdAt")
-        .populate("user likes", "avatar username fullname")
+        .populate("user likes", "avatar username fullname followers")
         .populate({
           path: "comments",
           populate: {
@@ -59,7 +80,15 @@ const postCtrl = {
           content,
           images,
         }
-      ).populate("user likes", "avatar username fullname");
+      )
+        .populate("user likes", "avatar username fullname")
+        .populate({
+          path: "comments",
+          populate: {
+            path: "user likes",
+            select: "-password",
+          },
+        });
 
       res.json({
         msg: "게시물 업데이트",
@@ -117,9 +146,11 @@ const postCtrl = {
   },
   getUserPosts: async (req, res) => {
     try {
-      const posts = await Posts.find({ user: req.params.id }).sort(
-        "-createdAt"
-      );
+      const features = new APIfeatures(
+        Posts.find({ user: req.params.id }),
+        req.query
+      ).paginating();
+      const posts = await features.query.sort("-createdAt");
       res.json({ posts, result: posts.length });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -142,6 +173,65 @@ const postCtrl = {
 
       res.json({
         post,
+      });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  getPostsDiscover: async (req, res) => {
+    // 팔로우가 된 user 만 보여주는 것이 아닌 팔로우가 되지 않은 모든 user의 게시물을 보여줌
+    try {
+      const newArr = [...req.user.following, req.user._id];
+
+      const num = req.query.num || 9;
+
+      const posts = await Posts.aggregate([
+        { $match: { user: { $nin: newArr } } },
+        { $sample: { size: Number(num) } },
+      ]);
+
+      return res.json({
+        msg: "성공",
+        result: posts.length,
+        posts,
+      });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+    // try {
+    //   const newArr = [...req.user.following, req.user._id];
+
+    //   const num = req.query.num || 9;
+
+    //   const posts = await Posts.aggregate([
+    //     { $match: { user: { $nin: newArr } } },
+    //     { $sample: { size: Number(num) } },
+    //   ]);
+
+    //   return res.json({
+    //     msg: "Success!",
+    //     result: posts.length,
+    //     posts,
+    //   });
+    // } catch (err) {
+    //   return res.status(500).json({ msg: err.message });
+    // }
+  },
+  deletePost: async (req, res) => {
+    try {
+      const post = await Posts.findByIdAndDelete({
+        _id: req.params.id,
+        user: req.user._id,
+      });
+
+      await Comments.deleteMany({ _id: { $in: post.comment } });
+
+      res.json({
+        msg: "삭제완료",
+        newPost: {
+          ...post,
+          user: req.user,
+        },
       });
     } catch (err) {
       return res.status(500).json({ msg: err.message });

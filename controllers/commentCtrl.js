@@ -6,6 +6,18 @@ const commnetCtrl = {
     try {
       const { postId, content, tag, reply, postUserId } = req.body;
 
+      const post = await Posts.findById(postId);
+      console.log(reply);
+      console.log(post);
+      if (!post)
+        return res.status(400).json({ msg: "존재하지않는게시물입니다" });
+
+      if (reply) {
+        const cm = await Comments.findById(reply);
+        if (!cm)
+          return res.status(400).json({ msg: "존재하지않는 댓글입니다" });
+      }
+
       const newComment = new Comments({
         user: req.user._id,
         content,
