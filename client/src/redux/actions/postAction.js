@@ -159,6 +159,40 @@ export const deletePost =
 
     try {
       const res = await deleteDataAPI(`post/${post._id}`, auth.token);
+      console.log(res);
+    } catch (err) {
+      dispatch({
+        type: GLOBALTYPES.ALERT,
+        payload: { error: err.response.data.msg },
+      });
+    }
+  };
+
+export const savePost =
+  ({ post, auth }) =>
+  async (dispatch) => {
+    const newUser = { ...auth.user, saved: [...auth.user.saved, post._id] };
+    dispatch({ type: GLOBALTYPES.AUTH, payload: { ...auth, user: newUser } });
+    try {
+      await patchDataAPI(`savePost/${post._id}`, null, auth.token);
+    } catch (err) {
+      dispatch({
+        type: GLOBALTYPES.ALERT,
+        payload: { error: err.response.data.msg },
+      });
+    }
+  };
+
+export const unSavePost =
+  ({ post, auth }) =>
+  async (dispatch) => {
+    const newUser = {
+      ...auth.user,
+      saved: auth.user.saved.filter((id) => id !== post._id),
+    };
+    dispatch({ type: GLOBALTYPES.AUTH, payload: { ...auth, user: newUser } });
+    try {
+      await patchDataAPI(`unSavePost/${post._id}`, null, auth.token);
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,

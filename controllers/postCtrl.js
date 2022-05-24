@@ -1,5 +1,6 @@
 const Posts = require("../models/postModel");
 const Comments = require("../models/commentModel");
+const Users = require("../models/userModel");
 
 class APIfeatures {
   constructor(query, queryString) {
@@ -232,6 +233,67 @@ const postCtrl = {
           ...post,
           user: req.user,
         },
+      });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  savePost: async (req, res) => {
+    try {
+      const user = await Users.find({
+        _id: req.user._id,
+        saved: req.params.id,
+      });
+      if (user.length > 0)
+        return res.status(400).json({ msg: "게시물을 저장하였습니다" });
+
+      const save = await Users.findOneAndUpdate(
+        { _id: req.user._id },
+        {
+          $push: { saved: req.params.id },
+        },
+        { new: true }
+      );
+
+      if (!save)
+        return res.status(400).json({ msg: "존재하지않는 유저입니다" });
+
+      res.json({ msg: "북마크 완료" });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  unSavePost: async (req, res) => {
+    try {
+      const save = await Users.findOneAndUpdate(
+        { _id: req.user._id },
+        {
+          $pull: { saved: req.params.id },
+        },
+        { new: true }
+      );
+
+      if (!save)
+        return res.status(400).json({ msg: "존재하지않는 유저입니다" });
+      res.json({ msg: "북마크 취소" });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  getSavePosts: async (req, res) => {
+    try {
+      const features = new APIfeatures(
+        Posts.find({
+          _id: { $in: req.user.saved },
+        }),
+        req.query
+      ).paginating();
+
+      const savePosts = await features.query.sort("-createdAt");
+
+      res.json({
+        savePosts,
+        result: savePosts.length,
       });
     } catch (err) {
       return res.status(500).json({ msg: err.message });

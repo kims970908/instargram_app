@@ -12,11 +12,11 @@ const RightSideBar = () => {
   const {auth, suggestions} = useSelector(state => state)
   const dispatch = useDispatch()
   return (
-    <div>
+    <div className='mt-3 shadow p-3 mb-5 bg-body rounded'>
       <UserCard user={auth.user} />
 
       <div className="d-flex justify-content-between align-items-center">
-        <h5 className='text-danger'>팔로우 추천</h5>
+        <h5 className='text-warning'>팔로우 추천</h5>
         {
           !suggestions.loading &&
           <i className="fas fa-redo" style={{cursor : 'pointer'}}
@@ -38,7 +38,7 @@ const RightSideBar = () => {
           }
         </div>
       }
-      <div className="my-2">
+      <div className="my-2 mt-3">
         <a href="https://www.google.com" target='_blank' rel='noreferrer' style={{wordBreak: 'break-all'}}>
           google
         </a>

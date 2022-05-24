@@ -3,41 +3,78 @@ import { Link } from "react-router-dom";
 import Send from "../../../images/send.svg";
 import LikeButton from "../../LikeButton";
 import ShareModal from "../../ShareModal";
-import {BASE_URL} from '../../../utils/config'
+import { BASE_URL } from "../../../utils/config";
 
 import { useSelector, useDispatch } from "react-redux";
-import { likePost, unLikePost } from "../../../redux/actions/postAction";
+import {
+  likePost,
+  savePost,
+  unLikePost,
+  unSavePost,
+} from "../../../redux/actions/postAction";
 
 const CardFooter = ({ post }) => {
   const [isLike, setIsLike] = useState(false);
   const [loadLike, setLoadLike] = useState(false);
   const [isShare, setIsShare] = useState(false);
 
+  const [saved, setSaved] = useState(false)
+  const [saveLoad, setSaveLoad] = useState(false)
+
   const dispatch = useDispatch();
   const { auth, theme } = useSelector((state) => state);
 
+  //likes
   const handleLike = async () => {
     if (loadLike) return;
     setIsLike(true);
-    
+
     setLoadLike(true);
-    await dispatch(likePost({post, auth}));
+    await dispatch(likePost({ post, auth }));
     setLoadLike(false);
   };
 
-  const handleUnLike = async() => {
+  //unlikes
+  const handleUnLike = async () => {
     setIsLike(false);
 
     setLoadLike(true);
-    await dispatch(unLikePost({post, auth}));
+    await dispatch(unLikePost({ post, auth }));
     setLoadLike(false);
   };
-  
-  useEffect(()=>{
-    if(post.likes.find(like => like._id === auth.user._id)){
-      setIsLike(true)
+
+  // likes
+  useEffect(() => {
+    if (post.likes.find((like) => like._id === auth.user._id)) {
+      setIsLike(true);
     }
-  },[post.likes, auth.user._id])
+  }, [post.likes, auth.user._id]);
+
+  // bookmark
+  useEffect(() => {
+    if (auth.user.saved.find((id) => id === post._id)) {
+      setSaved(true);
+    } else {
+      setSaved(false);
+    }
+  }, [auth.user.saved, post._id]);
+
+  const handleSavePost = async () => {
+    if (saveLoad) return;
+    setSaveLoad(true);
+
+    setSaveLoad(true);
+    await dispatch(savePost({ post, auth }));
+    setSaveLoad(false);
+  };
+
+  const handleUnSavePost = async () => {
+    setSaveLoad(false);
+
+    setSaveLoad(true);
+    await dispatch(unSavePost({ post, auth }));
+    setSaveLoad(false);
+  };
 
   return (
     <div className="card_footer">
@@ -53,10 +90,14 @@ const CardFooter = ({ post }) => {
             <i className="far fa-comment"></i>
           </Link>
 
-          <img src={Send} alt="Send" onClick={()=> setIsShare(!isShare)} />
+          <img src={Send} alt="Send" onClick={() => setIsShare(!isShare)} />
         </div>
 
-        <i className="far fa-bookmark" />
+        {saved ? (
+          <i className="fas fa-bookmark text-info" onClick={handleUnSavePost} />
+        ) : (
+          <i className="far fa-bookmark" onClick={handleSavePost} />
+        )}
       </div>
 
       <div className="d-flex justify-content-between">
@@ -67,10 +108,9 @@ const CardFooter = ({ post }) => {
           {post.comments.length} 댓글
         </h6>
       </div>
-      {
-        isShare &&
+      {isShare && (
         <ShareModal url={`${BASE_URL}/post/${post._id}`} theme={theme} />
-      }
+      )}
     </div>
   );
 };
