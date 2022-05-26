@@ -33,7 +33,7 @@ const Comments = ({ post }) => {
       {comments.length - next > 0 ? (
         <div
           className="p-2 border-top"
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer", color: "crimson" }}
           onClick={() => setNext(next + 10)}
         >
           더보기

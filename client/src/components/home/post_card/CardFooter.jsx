@@ -22,7 +22,7 @@ const CardFooter = ({ post }) => {
   const [saveLoad, setSaveLoad] = useState(false)
 
   const dispatch = useDispatch();
-  const { auth, theme } = useSelector((state) => state);
+  const { auth, theme, socket } = useSelector((state) => state);
 
   //likes
   const handleLike = async () => {
@@ -30,7 +30,7 @@ const CardFooter = ({ post }) => {
     setIsLike(true);
 
     setLoadLike(true);
-    await dispatch(likePost({ post, auth }));
+    await dispatch(likePost({ post, auth, socket }));
     setLoadLike(false);
   };
 
@@ -39,7 +39,7 @@ const CardFooter = ({ post }) => {
     setIsLike(false);
 
     setLoadLike(true);
-    await dispatch(unLikePost({ post, auth }));
+    await dispatch(unLikePost({ post, auth, socket }));
     setLoadLike(false);
   };
 

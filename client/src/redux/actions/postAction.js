@@ -103,13 +103,14 @@ export const updatePost =
   };
 
 export const likePost =
-  ({ post, auth }) =>
+  ({ post, auth, socket }) =>
   async (dispatch) => {
     const newPost = { ...post, likes: [...post.likes, auth.user] };
     dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
 
     try {
       await patchDataAPI(`post/${post._id}/like`, null, auth.token);
+      socket.emit("likePost", newPost);
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
@@ -119,7 +120,7 @@ export const likePost =
   };
 
 export const unLikePost =
-  ({ post, auth }) =>
+  ({ post, auth, socket }) =>
   async (dispatch) => {
     const newPost = {
       ...post,
@@ -130,6 +131,7 @@ export const unLikePost =
 
     try {
       await patchDataAPI(`post/${post._id}/unlike`, null, auth.token);
+      socket.emit("unLikePost", newPost);
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
@@ -153,7 +155,7 @@ export const getPost =
     }
   };
 export const deletePost =
-  ({ post, auth }) =>
+  ({ post, auth, socket }) =>
   async (dispatch) => {
     dispatch({ type: POST_TYPES.DELETE_POST, payload: post });
 
