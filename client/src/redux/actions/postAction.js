@@ -188,7 +188,7 @@ export const deletePost =
       // Notify
       const msg = {
         id: post._id,
-        text: "삭제 완료",
+        text: "added a new post.",
         recipients: res.data.newPost.user.followers,
         url: `/post/${post._id}`,
       };

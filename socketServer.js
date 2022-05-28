@@ -73,12 +73,12 @@ const SocketServer = (socket) => {
   //createNotify
   socket.on("createNotify", (msg) => {
     const client = users.find((user) => msg.recipients.includes(user.id));
-    client && socket.to(`${client.socket}`).emit("createNotifyToClient", msg);
+    client && socket.to(`${client.socketId}`).emit("createNotifyToClient", msg);
   });
   //removeNotify
   socket.on("removeNotify", (msg) => {
     const client = users.find((user) => msg.recipients.includes(user.id));
-    client && socket.to(`${client.socket}`).emit("removeNotifyToClient", msg);
+    client && socket.to(`${client.socketId}`).emit("removeNotifyToClient", msg);
   });
 };
 

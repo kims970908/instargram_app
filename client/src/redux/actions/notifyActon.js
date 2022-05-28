@@ -21,6 +21,16 @@ export const createNotify =
     try {
       const res = await postDataAPI("notify", msg, auth.token);
       console.log(res);
+
+      socket.emit("createNotify", {
+        ...res.data.notify,
+        user: {
+          username: auth.user.username,
+          avatar: auth.user.avatar,
+        },
+      });
+
+      console.log(socket);
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
@@ -35,6 +45,7 @@ export const removeNotify =
     try {
       console.log(msg);
       await deleteDataAPI(`notify/${msg.id}?url=${msg.url}`, auth.token);
+      socket.emit("removeNotify", msg);
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
@@ -43,7 +54,7 @@ export const removeNotify =
     }
   };
 
-  //get
+//get
 export const getNotifies = (token) => async (dispatch) => {
   try {
     const res = await getDataAPI("notifies", token);
