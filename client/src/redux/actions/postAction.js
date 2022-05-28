@@ -152,9 +152,18 @@ export const unLikePost =
 
     dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
 
+    socket.emit("unLikePost", newPost);
+
     try {
       await patchDataAPI(`post/${post._id}/unlike`, null, auth.token);
-      socket.emit("unLikePost", newPost);
+      // Notify
+      const msg = {
+        id: auth.user._id,
+        text: "like your post.",
+        recipients: [post.user._id],
+        url: `/post/${post._id}`,
+      };
+      dispatch(removeNotify({ msg, auth, socket }));
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
