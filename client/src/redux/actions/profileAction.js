@@ -103,7 +103,7 @@ export const updateProfileUser =
   };
 // ---------------------팔로우--------------------------------
 export const follow =
-  ({ users, user, auth }) =>
+  ({ users, user, auth, socket }) =>
   async (dispatch) => {
     let newUser;
 
@@ -128,7 +128,12 @@ export const follow =
     });
 
     try {
-      await patchDataAPI(`user/${user._id}/follow`, null, auth.token);
+      const res = await patchDataAPI(
+        `user/${user._id}/follow`,
+        null,
+        auth.token
+      );
+      socket.emit("follow", res.data.newUser);
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
@@ -138,7 +143,7 @@ export const follow =
   };
 // ------------------------언팔로우-----------------------------
 export const unfollow =
-  ({ users, user, auth }) =>
+  ({ users, user, auth, socket }) =>
   async (dispatch) => {
     let newUser;
 
@@ -170,9 +175,13 @@ export const unfollow =
         },
       },
     });
-
     try {
-      await patchDataAPI(`user/${user._id}/unfollow`, null, auth.token);
+      const res = await patchDataAPI(
+        `user/${user._id}/unfollow`,
+        null,
+        auth.token
+      );
+      socket.emit("unFollow", res.data.newUser);
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,

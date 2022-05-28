@@ -57,6 +57,29 @@ const SocketServer = (socket) => {
       });
     }
   });
+
+  //follow
+  socket.on("follow", (newUser) => {
+    const user = users.find((user) => user.id === newUser._id);
+    user && socket.to(`${user.socketId}`).emit("followToClient", newUser);
+  });
+
+  //Unfollow
+  socket.on("unFollow", (newUser) => {
+    const user = users.find((user) => user.id === newUser._id);
+    user && socket.to(`${user.socketId}`).emit("unFollowToClient", newUser);
+  });
+
+  //createNotify
+  socket.on("createNotify", (msg) => {
+    const client = users.find((user) => msg.recipients.includes(user.id));
+    client && socket.to(`${client.socket}`).emit("createNotifyToClient", msg);
+  });
+  //removeNotify
+  socket.on("removeNotify", (msg) => {
+    const client = users.find((user) => msg.recipients.includes(user.id));
+    client && socket.to(`${client.socket}`).emit("removeNotifyToClient", msg);
+  });
 };
 
 module.exports = SocketServer;

@@ -34,7 +34,10 @@ const postCtrl = {
 
     res.json({
       msg: "Create Post",
-      newPost,
+      newPost: {
+        ...newPost._doc,
+        user: req.user,
+      },
     });
 
     try {

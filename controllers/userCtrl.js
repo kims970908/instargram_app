@@ -59,11 +59,13 @@ const userCtrl = {
         followers: req.user._id,
       });
       if (user.length > 0)
-        return res.status(500).json({ msg: "이미 팔로우 하고있습니다" });
+        return res.status(500).json({ msg: "이미 팔로워 중입니다" });
 
-      await Users.findOneAndUpdate(
+      const newUser = await Users.findOneAndUpdate(
         { _id: req.params.id },
-        { $push: { followers: req.user._id } },
+        {
+          $push: { followers: req.user._id },
+        },
         { new: true }
       ).populate("followers following", "-password");
 
@@ -74,6 +76,8 @@ const userCtrl = {
         },
         { new: true }
       );
+
+      res.json({ newUser });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
@@ -95,6 +99,8 @@ const userCtrl = {
         },
         { new: true }
       );
+
+      res.json({ newUser });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

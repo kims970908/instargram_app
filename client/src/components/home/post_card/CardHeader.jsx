@@ -11,14 +11,14 @@ import moment from "moment";
 import "moment/locale/ko";
 
 const CardHeader = ({ post }) => {
-  const { auth } = useSelector((state) => state);
+  const { auth,socket } = useSelector((state) => state);
   const dispatch = useDispatch();
 
   const history = useHistory()
 
   const handleDeletePost = () =>{
     if(window.confirm('게시물을 삭제하시겠습니까?'))
-    dispatch(deletePost({post,auth}))
+    dispatch(deletePost({post,auth, socket}))
 
     return history.push('/')
   }

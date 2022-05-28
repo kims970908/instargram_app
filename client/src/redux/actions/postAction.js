@@ -6,6 +6,7 @@ import {
   deleteDataAPI,
   patchDataAPI,
 } from "../../utils/fetchData";
+import { createNotify, removeNotify } from "./notifyActon";
 
 export const POST_TYPES = {
   CREATE_POST: "CREATE_POST",
@@ -17,7 +18,7 @@ export const POST_TYPES = {
 };
 
 export const createPost =
-  ({ content, images, auth }) =>
+  ({ content, images, auth, socket }) =>
   async (dispatch) => {
     let media = [];
     try {
@@ -36,6 +37,17 @@ export const createPost =
       });
 
       dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: false } });
+
+      const msg = {
+        id: res.data.newPost._id,
+        text: "게시물 생성",
+        recipients: res.data.newPost.user.followers,
+        url: `/post/${res.data.newPost._id}`,
+        content,
+        image: media[0].url,
+      };
+
+      dispatch(createNotify({ msg, auth, socket }));
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
@@ -108,9 +120,20 @@ export const likePost =
     const newPost = { ...post, likes: [...post.likes, auth.user] };
     dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
 
+    socket.emit("likePost", newPost);
     try {
       await patchDataAPI(`post/${post._id}/like`, null, auth.token);
-      socket.emit("likePost", newPost);
+      // Notify
+      const msg = {
+        id: auth.user._id,
+        text: "like your post.",
+        recipients: [post.user._id],
+        url: `/post/${post._id}`,
+        content: post.content,
+        image: post.images[0].url,
+      };
+
+      dispatch(createNotify({ msg, auth, socket }));
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
@@ -161,7 +184,15 @@ export const deletePost =
 
     try {
       const res = await deleteDataAPI(`post/${post._id}`, auth.token);
-      console.log(res);
+
+      // Notify
+      const msg = {
+        id: post._id,
+        text: "삭제 완료",
+        recipients: res.data.newPost.user.followers,
+        url: `/post/${post._id}`,
+      };
+      dispatch(removeNotify({ msg, auth, socket }));
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
