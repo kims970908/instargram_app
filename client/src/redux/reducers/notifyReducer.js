@@ -40,7 +40,7 @@ const notifyReducer = (state = initialState, action) => {
     case NOTIFY_TYPES.UPDATE_SOUND:
       return {
         ...state,
-        data: action.payload,
+        sound: action.payload,
       };
     //-----------------DELETE_ALL_NOTIFY--------------------------
     case NOTIFY_TYPES.DELETE_ALL_NOTIFIES:

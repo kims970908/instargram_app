@@ -24,7 +24,6 @@ const SocketClient = () => {
       window.open(url, "_blank");
     };
   };
-
   //connect User
   useEffect(() => {
     socket.emit("joinUser", auth.user._id);
@@ -62,6 +61,22 @@ const SocketClient = () => {
     return () => socket.off("deleteCommentToClient");
   }, [socket, dispatch]);
 
+  // //CommentLike
+  // useEffect(() => {
+  //   socket.on("commentLikeToClient", (newPost) => {
+  //     dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
+  //   });
+  //   return () => socket.off("commentLikeToClient");
+  // }, [socket, dispatch]);
+
+  // //CommentUnLike
+  // useEffect(() => {
+  //   socket.on("commentUnLikeToClient", (newPost) => {
+  //     dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
+  //   });
+  //   return () => socket.off("commentUnLikeToClient");
+  // }, [socket, dispatch]);
+
   // follow
   useEffect(() => {
     socket.on("followToClient", (newUser) => {
@@ -84,14 +99,14 @@ const SocketClient = () => {
       dispatch({ type: NOTIFY_TYPES.CREATE_NOTIFY, payload: msg });
 
       if (notify.sound) audioRef.current.play();
-
       spawnNotification(
-        msg.user.username + "" + msg.text,
+        msg.user.username + " " + msg.text,
         msg.user.avatar,
         msg.url,
         "SOCIAL"
       );
     });
+    return () => socket.off("createNotifyToClient");
   }, [socket, dispatch, notify.sound]);
 
   //removeNotify
@@ -102,7 +117,13 @@ const SocketClient = () => {
     return () => socket.off("removeNotifyToClient");
   }, [socket, dispatch]);
 
-  return <></>;
+  return (
+    <>
+      <audio controls ref={audioRef} style={{ display: "none" }}>
+        <source src={audiobell} type="audio/mp3" />
+      </audio>
+    </>
+  );
 };
 
 export default SocketClient;

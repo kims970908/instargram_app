@@ -27,11 +27,7 @@ const NotifyModal = () => {
     const newArr = notify.data.filter((item) => item.isRead === false);
     if (newArr.length === 0) return dispatch(deleteAllNotifies(auth.token));
 
-    if (
-      window.confirm(
-        `${newArr.length}개의 알림을 삭제하겠습니다`
-      )
-    ) {
+    if (window.confirm(`${newArr.length}개의 알림을 삭제하겠습니다`)) {
       return dispatch(deleteAllNotifies(auth.token));
     }
   };
@@ -42,13 +38,13 @@ const NotifyModal = () => {
         <h3>알림</h3>
         {notify.sound ? (
           <i
-            className="fas fa-bell textdanger"
+            className="fas fa-bell text-danger"
             style={{ fontSize: "1.2rem", cursor: "pointer" }}
             onClick={handleSound}
           />
         ) : (
           <i
-            className="fas fa-bell-slash textdanger"
+            className="fas fa-bell-slash text-danger"
             style={{ fontSize: "1.2rem", cursor: "pointer" }}
             onClick={handleSound}
           />

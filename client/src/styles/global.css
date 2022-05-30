@@ -70,6 +70,9 @@ img{
 /* ----------POST THUMB CSS 추가----------- */
 @import url(./post_thumb.css);
 
+/* ----------MESSAGE CSS 추가----------- */
+@import url(./message.css);
+
 .mode{
   width: 100%;
   height: 100vh;

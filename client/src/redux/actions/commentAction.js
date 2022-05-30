@@ -97,49 +97,72 @@ export const updateComment =
   };
 
 export const likeComment =
-  ({ comment, post, auth }) =>
-  async (dispatch) => {
-    const newComment = { ...comment, likes: [...comment.likes, auth.user] };
+  //socket, commentId
 
-    const newComments = EditData(post.comments, comment._id, newComment);
 
-    const newPost = { ...post, comments: newComments };
+    ({ comment, post, auth }) =>
+    async (dispatch) => {
+      const newComment = { ...comment, likes: [...comment.likes, auth.user] };
 
-    dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
+      const newComments = EditData(post.comments, comment._id, newComment);
 
-    try {
-      await patchDataAPI(`comment/${comment._id}/like`, null, auth.token);
-    } catch (err) {
-      dispatch({
-        type: GLOBALTYPES.ALERT,
-        payload: { error: err.response.data.msg },
-      });
-    }
-  };
+      const newPost = { ...post, comments: newComments };
 
-export const unLikeComment =
-  ({ comment, post, auth }) =>
-  async (dispatch) => {
-    const newComment = {
-      ...comment,
-      likes: DeleteData(comment.likes, auth.user._id),
+      dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
+
+      try {
+        await patchDataAPI(`comment/${comment._id}/like`, null, auth.token);
+
+        // // Socket
+        // socket.emit("commentLike", newPost);
+
+        // // Notify
+        // const msg = {
+        //   id: commentId,
+        //   text: "like your comment",
+        //   recipients: [comment.tag._id],
+        //   url: `/post/${post._id}`,
+        //   content: post.content,
+        //   image: post.images[0].url,
+        // };
+
+        // dispatch(createNotify({ msg, auth, socket }));
+      } catch (err) {
+        dispatch({
+          type: GLOBALTYPES.ALERT,
+          payload: { error: err.response.data.msg },
+        });
+      }
     };
 
-    const newComments = EditData(post.comments, comment._id, newComment);
+export const unLikeComment =
+  //socket
 
-    const newPost = { ...post, comments: newComments };
+    ({ comment, post, auth }) =>
+    async (dispatch) => {
+      const newComment = {
+        ...comment,
+        likes: DeleteData(comment.likes, auth.user._id),
+      };
 
-    dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
+      const newComments = EditData(post.comments, comment._id, newComment);
 
-    try {
-      await patchDataAPI(`comment/${comment._id}/unlike`, null, auth.token);
-    } catch (err) {
-      dispatch({
-        type: GLOBALTYPES.ALERT,
-        payload: { error: err.response.data.msg },
-      });
-    }
-  };
+      const newPost = { ...post, comments: newComments };
+
+      dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
+
+      try {
+        await patchDataAPI(`comment/${comment._id}/unlike`, null, auth.token);
+
+        //Socket
+        // socket.emit("commentUnLike", newPost);
+      } catch (err) {
+        dispatch({
+          type: GLOBALTYPES.ALERT,
+          payload: { error: err.response.data.msg },
+        });
+      }
+    };
 
 export const deleteComment =
   ({ post, comment, auth, socket }) =>

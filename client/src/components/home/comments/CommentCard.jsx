@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
 const CommentCard = ({ children, comment, post, commentId }) => {
-  const { auth } = useSelector((state) => state);
+  const { auth, socket } = useSelector((state) => state);
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
@@ -56,6 +56,7 @@ const CommentCard = ({ children, comment, post, commentId }) => {
     setIsLike(true);
 
     setLoadLike(true);
+    // socket, commentId
     await dispatch(likeComment({ comment, post, auth }));
     setLoadLike(false);
   };
@@ -65,7 +66,7 @@ const CommentCard = ({ children, comment, post, commentId }) => {
     setIsLike(false);
 
     setLoadLike(true);
-    await dispatch(unLikeComment({ comment, post, auth }));
+    await dispatch(unLikeComment({ comment, post, auth, socket }));
     setLoadLike(false);
   };
 
@@ -91,12 +92,11 @@ const CommentCard = ({ children, comment, post, commentId }) => {
             />
           ) : (
             <div>
-              {
-                comment.tag && comment.tag._id !== comment.user._id &&
+              {comment.tag && comment.tag._id !== comment.user._id && (
                 <Link to={`/profile/${comment.tag._id}`} className="mr-2">
-                @{comment.tag.username}
+                  @{comment.tag.username}
                 </Link>
-              }
+              )}
               <span>
                 {content.length < 100
                   ? content
@@ -154,7 +154,7 @@ const CommentCard = ({ children, comment, post, commentId }) => {
           </>
         ) : (
           <small className="font-weight-bold mr-3" onClick={handleReply}>
-            {onReply ? "취소" :  "댓글"}
+            {onReply ? "취소" : "댓글"}
           </small>
         )}
       </div>

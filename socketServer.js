@@ -58,6 +58,28 @@ const SocketServer = (socket) => {
     }
   });
 
+  // // CommentLike
+  // socket.on("commentLike", (newPost) => {
+  //   const ids = [...newPost.user.followers, newPost.user._id];
+  //   const clients = users.filter((user) => ids.includes(user.id));
+  //   if (clients.length > 0) {
+  //     clients.forEach((client) => {
+  //       socket.to(`${client.socketId}`).emit("commentLikeToClient", newPost);
+  //     });
+  //   }
+  // });
+
+  // // CommentUnLike
+  // socket.on("commentUnlike", (newPost) => {
+  //   const ids = [...newPost.user.followers, newPost.user._id];
+  //   const clients = users.filter((user) => ids.includes(user.id));
+  //   if (clients.length > 0) {
+  //     clients.forEach((client) => {
+  //       socket.to(`${client.socketId}`).emit("commentUnLikeToClient", newPost);
+  //     });
+  //   }
+  // });
+
   //follow
   socket.on("follow", (newUser) => {
     const user = users.find((user) => user.id === newUser._id);
