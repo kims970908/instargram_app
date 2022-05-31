@@ -18,7 +18,7 @@ const UserCard = ({
   };
   return (
     <div
-      className={`d-flex p-2 align-item-center justify-content-between font-weight-${bold} ${border}`}
+      className={`d-flex p-2 align-items-center justify-content-between font-weight-${bold} ${border} w-100`}
     >
       <div>
         <Link

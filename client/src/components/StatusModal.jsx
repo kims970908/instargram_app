@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { GLOBALTYPES } from "../redux/actions/globalTypes";
 import { createPost, updatePost } from "../redux/actions/postAction";
+import { imageShow, videoShow } from "../utils/mediaShow";
+import Icons from './Icons'
 
 const StatusModal = () => {
   const { auth, theme, status, socket } = useSelector((state) => state);
@@ -79,7 +81,7 @@ const StatusModal = () => {
     e.preventDefault();
 
     if (status.onEdit) {
-      dispatch(updatePost({content, images, auth, status}))
+      dispatch(updatePost({ content, images, auth, status }));
     } else {
       dispatch(createPost({ content, images, auth, socket }));
     }
@@ -122,21 +124,30 @@ const StatusModal = () => {
               background: theme ? "rgba(0,0,0,.03)" : "",
             }}
           />
-          {/* images show view */}
+          <div className="d-flex">
+            <div className="flex-fill"></div>
+            <Icons setContent={setContent} content={content} theme={theme} />
+          </div>
+
+
           <div className="show_images">
             {images.map((img, index) => (
               <div key={index} id="file_img">
-                <img
-                  src={
-                    img.camera
-                      ? img.camera
-                      : img.url
-                      ? img.url
-                      : URL.createObjectURL(img)
-                  }
-                  alt="images"
-                  className="img-thumbnail"
-                />
+                {img.camera ? (
+                  imageShow(img.camera, theme)
+                ) : img.url ? (
+                  <>
+                    {img.url.match(/video/i)
+                      ? videoShow(img.url, theme)
+                      : imageShow(img.url, theme)}
+                  </>
+                ) : (
+                  <>
+                    {img.type.match(/video/i)
+                      ? videoShow(URL.createObjectURL(img), theme)
+                      : imageShow(URL.createObjectURL(img), theme)}
+                  </>
+                )}
                 <span onClick={() => deleteImages(index)}>&times;</span>
               </div>
             ))}

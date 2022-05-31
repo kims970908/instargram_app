@@ -1,9 +1,63 @@
-import React from 'react'
+import React, { useState, useEffect } from "react";
+import UserCard from "../UserCard";
+import { useSelector, useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
+import MsgDisplay from './MsgDisplay'
 
 const RightSide = () => {
-  return (
-    <div>RightSide</div>
-  )
-}
+  const { auth, message } = useSelector((state) => state);
+  const dispatch = useDispatch();
 
-export default RightSide
+  const { id } = useParams();
+  const [user, setUser] = useState([]);
+  const [text, setText] = useState('')
+
+  useEffect(() => {
+    const newUser = message.users.find((user) => user._id === id);
+    if (newUser) {
+      setUser(newUser);
+    }
+  }, [message.users, id]);
+
+  return (
+    <>
+    <div className="message_header">
+      <UserCard user={user}>
+        <i className="fas fa-trash text-danger"></i>
+      </UserCard>
+    </div>
+
+    <div className="chat_container">
+      <div className="chat_display">
+
+        <div className="chat_row other_message">
+          <MsgDisplay user={user} />
+        </div>
+
+        <div className="chat_row you_message">
+          <MsgDisplay user={auth.user} />
+        </div>
+      </div>
+    </div>
+
+    <form className="chat_input">
+      <input  
+      type="text" 
+      placeholder="입력해주세요"
+      value={text}
+      onChange={e=>setText(e.target.value)}
+       />
+
+       <button 
+       className="material-icons"
+       type="submit"
+       disabled={text ? false : true}
+       >
+         near_me
+       </button>
+    </form>
+    </>
+  );
+};
+
+export default RightSide;

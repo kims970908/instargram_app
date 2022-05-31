@@ -9,7 +9,7 @@ const Carousel = ({ images, id }) => {
   const { theme } = useSelector((state) => state);
 
   return (
-    <div id={`image${id}`} className="carousel slide" data-ride="carousel">
+    <div id={`image${id}`} className="carousel slide" data-ride="carousel" >
       <ol className="carousel-indicators" style={{ zIndex: 1 }}>
         {images.map((img, index) => (
           <li
@@ -24,7 +24,7 @@ const Carousel = ({ images, id }) => {
       <div className="carousel-inner">
         {images.map((img, index) => (
           <div key={index} className={`carousel-item ${isActive(index)}`}>
-             {/* {img.url.match(/video/i) ? (
+            {img.url.match(/video/i) ? (
               <video
                 controls
                 src={img.url}
@@ -39,13 +39,7 @@ const Carousel = ({ images, id }) => {
                 alt={img.url}
                 style={{ filter: theme ? "invert(1)" : "invert(0)" }}
               />
-            )} */}
-            <img
-              src={img.url}
-              className="d-block w-100"
-              alt={img.url}
-              style={{ filter: theme ? "invert(1)" : "invert(0)" }}
-            />{" "}
+            )}
           </div>
         ))}
       </div>
