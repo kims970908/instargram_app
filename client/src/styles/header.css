@@ -53,7 +53,7 @@
 .header .search_form #search{
   background: #fafafa;
   border: 1px solid #ddd;
-  min-width: 350px;
+  min-width: 250px;
   width: 100%;
   outline: none;
   text-indent: 5px;
@@ -96,6 +96,4 @@
   height: 15px;
   transform: translateY(-50%);
 }
-
-
 

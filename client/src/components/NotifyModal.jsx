@@ -6,7 +6,7 @@ import {
   NOTIFY_TYPES,
   isReadNotify,
   deleteAllNotifies,
-} from "../redux/actions/notifyActon";
+} from "../redux/actions/notifyAction";
 import Notice from "../images/notice.png";
 
 import Avatar from "./Avatar";

@@ -6,7 +6,7 @@ import {
   deleteDataAPI,
   patchDataAPI,
 } from "../../utils/fetchData";
-import { createNotify, removeNotify } from "./notifyActon";
+import { createNotify, removeNotify } from "./notifyAction";
 
 export const POST_TYPES = {
   CREATE_POST: "CREATE_POST",

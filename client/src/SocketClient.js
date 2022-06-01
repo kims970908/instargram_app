@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { GLOBALTYPES } from "./redux/actions/globalTypes";
-import { NOTIFY_TYPES } from "./redux/actions/notifyActon";
+import { NOTIFY_TYPES } from "./redux/actions/notifyAction";
 import { POST_TYPES } from "./redux/actions/postAction";
 
 import audiobell from "./audio/got-it-done-613.mp3";

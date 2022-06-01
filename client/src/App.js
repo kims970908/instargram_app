@@ -25,7 +25,7 @@ import io from "socket.io-client";
 import { GLOBALTYPES } from "./redux/actions/globalTypes";
 import SocketClient from "./SocketClient";
 
-import { getNotifies } from "./redux/actions/notifyActon";
+import { getNotifies } from "./redux/actions/notifyAction";
 
 function App() {
   const { auth, status, modal } = useSelector((state) => state);
