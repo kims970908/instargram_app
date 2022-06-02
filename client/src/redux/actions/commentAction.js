@@ -71,7 +71,7 @@ export const updateComment =
   };
 
 export const likeComment =
-  ({ comment, post, auth }) =>
+  ({ comment, post, auth, socket, commentId }) =>
   async (dispatch) => {
     const newComment = { ...comment, likes: [...comment.likes, auth.user] };
 
@@ -83,6 +83,21 @@ export const likeComment =
 
     try {
       await patchDataAPI(`comment/${comment._id}/like`, null, auth.token);
+
+      socket.emit("likeComment", newPost);
+
+      // Notify
+      const msg = {
+        id: commentId,
+        text: newComment.reply,
+        recipients: commentId.reply ? [commentId.tag._id] : [post.user._id],
+        url: `/post/${post._id}`,
+        content: post.content,
+        image: post.images[0].url,
+      };
+
+      // Comment To Client Notifycation
+      dispatch(createNotify({ msg, auth, socket }));
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
@@ -92,7 +107,7 @@ export const likeComment =
   };
 
 export const unLikeComment =
-  ({ comment, post, auth }) =>
+  ({ comment, post, auth, socket, commentId }) =>
   async (dispatch) => {
     const newComment = {
       ...comment,
@@ -107,6 +122,19 @@ export const unLikeComment =
 
     try {
       await patchDataAPI(`comment/${comment._id}/unlike`, null, auth.token);
+
+      socket.emit("unLikeComment", newPost);
+
+      const msg = {
+        id: commentId,
+        text: comment.reply
+          ? "mentioned you in a comment."
+          : "has commented on your post.",
+        recipients: commentId.reply ? [commentId.tag._id] : [post.user._id],
+        url: `/post/${post._id}`,
+      };
+
+      dispatch(removeNotify({ msg, auth, socket }));
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,

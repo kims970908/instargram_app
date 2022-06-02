@@ -8,7 +8,7 @@ import { GLOBALTYPES } from '../../redux/actions/globalTypes'
 const Saved = ({auth, dispatch}) => {
   const [savePosts, setSavePosts] = useState([])
   const [result, setResult] = useState(9)
-  const [page, setPage] = useState(2)
+  const [page, setPage] = useState(1)
   const [load, setLoad] = useState(false)
 
   useEffect(()=>{

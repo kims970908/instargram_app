@@ -57,7 +57,7 @@ const CommentCard = ({ children, comment, post, commentId }) => {
 
     setLoadLike(true);
     // socket, commentId
-    await dispatch(likeComment({ comment, post, auth }));
+    await dispatch(likeComment({ comment, post, auth,socket, commentId  }));
     setLoadLike(false);
   };
 
@@ -66,7 +66,7 @@ const CommentCard = ({ children, comment, post, commentId }) => {
     setIsLike(false);
 
     setLoadLike(true);
-    await dispatch(unLikeComment({ comment, post, auth, socket }));
+    await dispatch(unLikeComment({ comment, post, auth, socket, commentId }));
     setLoadLike(false);
   };
 

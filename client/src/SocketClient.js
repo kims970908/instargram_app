@@ -61,21 +61,21 @@ const SocketClient = () => {
     return () => socket.off("deleteCommentToClient");
   }, [socket, dispatch]);
 
-  // //CommentLike
-  // useEffect(() => {
-  //   socket.on("commentLikeToClient", (newPost) => {
-  //     dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
-  //   });
-  //   return () => socket.off("commentLikeToClient");
-  // }, [socket, dispatch]);
+  //CommentLike
+  useEffect(() => {
+    socket.on("commentLikeToClient", (newPost) => {
+      dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
+    });
+    return () => socket.off("commentLikeToClient");
+  }, [socket, dispatch]);
 
-  // //CommentUnLike
-  // useEffect(() => {
-  //   socket.on("commentUnLikeToClient", (newPost) => {
-  //     dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
-  //   });
-  //   return () => socket.off("commentUnLikeToClient");
-  // }, [socket, dispatch]);
+  //CommentUnLike
+  useEffect(() => {
+    socket.on("commentUnLikeToClient", (newPost) => {
+      dispatch({ type: POST_TYPES.UPDATE_POST, payload: newPost });
+    });
+    return () => socket.off("commentUnLikeToClient");
+  }, [socket, dispatch]);
 
   // follow
   useEffect(() => {
