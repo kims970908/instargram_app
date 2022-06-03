@@ -5,6 +5,7 @@ import { NOTIFY_TYPES } from "./redux/actions/notifyAction";
 import { POST_TYPES } from "./redux/actions/postAction";
 
 import audiobell from "./audio/got-it-done-613.mp3";
+import { MESS_TYPES } from "./redux/actions/messageAction";
 
 const SocketClient = () => {
   const { auth, socket, notify } = useSelector((state) => state);
@@ -116,6 +117,24 @@ const SocketClient = () => {
     });
     return () => socket.off("removeNotifyToClient");
   }, [socket, dispatch]);
+
+  // Message
+  // useEffect(() => {
+  //   socket.on("addMessageToClient", (msg) => {
+  //     dispatch({ type: MESS_TYPES.ADD_MESSAGE, payload: msg });
+
+  //     dispatch({
+  //       type: MESS_TYPES.ADD_USER,
+  //       payload: {
+  //         ...msg.user,
+  //         text: msg.text,
+  //         media: msg.media,
+  //       },
+  //     });
+  //   });
+
+  //   return () => socket.off("addMessageToClient");
+  // }, [socket, dispatch]);
 
   return (
     <>

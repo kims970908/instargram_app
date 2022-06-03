@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UserCard from "../UserCard";
 import { useSelector, useDispatch } from "react-redux";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 import { getDataAPI } from "../../utils/fetchData";
 import { useHistory, useParams } from "react-router-dom";
-import { addUser, MESS_TYPES } from "../../redux/actions/messageAction";
+import {
+  addUser,
+  MESS_TYPES,
+  getConversations,
+} from "../../redux/actions/messageAction";
 
 const LeftSide = () => {
   const { auth, message } = useSelector((state) => state);
-  const {id}= useParams()
+  const { id } = useParams();
 
   const [search, setSearch] = useState("");
   const [searchUsers, setSearchUsers] = useState([]);
@@ -38,10 +42,16 @@ const LeftSide = () => {
     return history.push(`/message/${user._id}`);
   };
 
-  const isActive = user =>{
-    if(id === user._id) return 'active'
-    return ''
-  }
+  const isActive = (user) => {
+    if (id === user._id) return "active";
+    return "";
+  };
+
+  // getConversation
+  useEffect(() => {
+    if (message.firstLoad) return;
+    dispatch(getConversations({ auth }));
+  }, [dispatch, auth, message.firstLoad]);
 
   return (
     <>
@@ -78,7 +88,7 @@ const LeftSide = () => {
                 className={`message_user ${isActive(user)}`}
                 onClick={() => handleAddUser(user)}
               >
-                <UserCard user={user}>
+                <UserCard user={user} msg={true}>
                   <i className="fas fa-circle" />
                 </UserCard>
               </div>
