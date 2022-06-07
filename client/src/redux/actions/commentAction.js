@@ -84,20 +84,20 @@ export const likeComment =
     try {
       await patchDataAPI(`comment/${comment._id}/like`, null, auth.token);
 
-      socket.emit("likeComment", newPost);
+      // socket.emit("likeComment", newPost);
 
-      // Notify
-      const msg = {
-        id: commentId,
-        text: newComment.reply,
-        recipients: commentId.reply ? [commentId.tag._id] : [post.user._id],
-        url: `/post/${post._id}`,
-        content: post.content,
-        image: post.images[0].url,
-      };
+      // // Notify
+      // const msg = {
+      //   id: commentId,
+      //   text: newComment.reply,
+      //   recipients: commentId.reply ? [commentId.tag._id] : [post.user._id],
+      //   url: `/post/${post._id}`,
+      //   content: post.content,
+      //   image: post.images[0].url,
+      // };
 
-      // Comment To Client Notifycation
-      dispatch(createNotify({ msg, auth, socket }));
+      // // Comment To Client Notifycation
+      // dispatch(createNotify({ msg, auth, socket }));
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
@@ -123,18 +123,18 @@ export const unLikeComment =
     try {
       await patchDataAPI(`comment/${comment._id}/unlike`, null, auth.token);
 
-      socket.emit("unLikeComment", newPost);
+      // socket.emit("unLikeComment", newPost);
 
-      const msg = {
-        id: commentId,
-        text: comment.reply
-          ? "mentioned you in a comment."
-          : "has commented on your post.",
-        recipients: commentId.reply ? [commentId.tag._id] : [post.user._id],
-        url: `/post/${post._id}`,
-      };
+      // const msg = {
+      //   id: commentId,
+      //   text: comment.reply
+      //     ? "mentioned you in a comment."
+      //     : "has commented on your post.",
+      //   recipients: commentId.reply ? [commentId.tag._id] : [post.user._id],
+      //   url: `/post/${post._id}`,
+      // };
 
-      dispatch(removeNotify({ msg, auth, socket }));
+      // dispatch(removeNotify({ msg, auth, socket }));
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,

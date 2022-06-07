@@ -4,9 +4,9 @@ const messageSchema = new mongoose.Schema(
   {
     coversation: { type: mongoose.Types.ObjectId, ref: "conversation" },
     sender: { type: mongoose.Types.ObjectId, ref: "user" },
+    recipient: { type: mongoose.Types.ObjectId, ref: "user" },
     text: String,
     media: Array,
-    call: Object,
   },
   {
     timestamps: true,

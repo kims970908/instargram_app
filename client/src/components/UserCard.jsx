@@ -35,21 +35,22 @@ const UserCard = ({
             <span className="d-block">{user.username}</span>
             <small style={{ opacity: 0.7 }}>
               {
-              msg
-              ? (
-                <>
-                  <div style={{ filter: theme ? "invert(1)" : "invert(0)" }}>
-                    {user.text}
-                  </div>
-                  {user.media.length > 0 && (
-                    <div>
-                      {user.media.length} <i className="fas fa-image" />
+                user.text || user.media
+                ? (
+                  <>
+                    <div style={{ filter: theme ? "invert(1)" : "invert(0)" }}>
+                      {user.text}
                     </div>
-                  )}
-                </>
-              ) : (
-                user.fullname
-              )}
+                    {user.media.length > 0 && (
+                      <div>
+                        {user.media.length} <i className="fas fa-image" />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  user.fullname
+                )
+              }
             </small>
           </div>
         </Link>

@@ -4,11 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 import { getDataAPI } from "../../utils/fetchData";
 import { useHistory, useParams } from "react-router-dom";
-import {
-  addUser,
-  MESS_TYPES,
-  getConversations,
-} from "../../redux/actions/messageAction";
+import { addUser, getConversations } from "../../redux/actions/messageAction";
 
 const LeftSide = () => {
   const { auth, message } = useSelector((state) => state);
@@ -21,6 +17,7 @@ const LeftSide = () => {
 
   const history = useHistory();
 
+  // 유저 검색
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!search) return;
@@ -35,6 +32,7 @@ const LeftSide = () => {
     }
   };
 
+  //유저 추가
   const handleAddUser = (user) => {
     setSearch("");
     setSearchUsers([]);

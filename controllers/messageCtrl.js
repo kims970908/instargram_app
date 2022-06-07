@@ -20,6 +20,7 @@ const messageCtrl = {
   createMessage: async (req, res) => {
     try {
       const { recipient, text, media } = req.body;
+
       if (!recipient || (!text.trim() && media.length === 0)) return;
 
       const newConversation = await Conversations.findOneAndUpdate(
@@ -38,15 +39,16 @@ const messageCtrl = {
       );
 
       const newMessage = new Messages({
-        conversation: newConversation.id,
+        conversation: newConversation._id,
         sender: req.user._id,
         recipient,
         text,
         media,
       });
+
       await newMessage.save();
 
-      res.json("성공!");
+      res.json({ msg: "Create Success!" });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
@@ -61,7 +63,7 @@ const messageCtrl = {
       ).paginating();
 
       const conversations = await features.query
-        .sort("-updateAt")
+        .sort("-updatedAt")
         .populate("recipients", "avatar username fullname");
 
       res.json({
@@ -78,7 +80,7 @@ const messageCtrl = {
         Messages.find({
           $or: [
             { sender: req.user._id, recipient: req.params.id },
-            { sender: req.params.id, recipient: req.params.id },
+            { sender: req.params.id, recipient: req.user._id },
           ],
         }),
         req.query

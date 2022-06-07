@@ -10,12 +10,9 @@ export const MESS_TYPES = {
 
 export const addUser =
   ({ user, message }) =>
-  (dispatch) => {
+  async (dispatch) => {
     if (message.users.every((item) => item._id !== user._id)) {
-      dispatch({
-        type: MESS_TYPES.ADD_USER,
-        payload: { ...user, text: "", media: [] },
-      });
+      dispatch({ type: MESS_TYPES.ADD_USER, payload: user });
     }
   };
 
@@ -23,16 +20,9 @@ export const addMessage =
   ({ msg, auth, socket }) =>
   async (dispatch) => {
     dispatch({ type: MESS_TYPES.ADD_MESSAGE, payload: msg });
-
-    // const { _id, avatar, fullname, username } = auth.user;
-    // socket.emit("addMessage", {
-    //   ...msg,
-    //   user: { _id, avatar, fullname, username },
-    // });
-
-    socket.emit("addMessage", msg);
     try {
       await postDataAPI("message", msg, auth.token);
+      socket.emit("addMessage", msg);
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,
@@ -46,6 +36,7 @@ export const getConversations =
   async (dispatch) => {
     try {
       const res = await getDataAPI("conversations", auth.token);
+
       let newArr = [];
       res.data.conversations.forEach((item) => {
         item.recipients.forEach((cv) => {
@@ -67,13 +58,14 @@ export const getConversations =
   };
 
 export const getMessages =
-  ({ auth, id }) =>
+  ({ auth, id, page = 1 }) =>
   async (dispatch) => {
     try {
-      const res = await getDataAPI(`message/${id}`, auth.token);
-      console.log(res);
+      const res = await getDataAPI(
+        `message/${id}?limit=${page * 9}`,
+        auth.token
+      );
       dispatch({ type: MESS_TYPES.GET_MESSAGES, payload: res.data });
-      // const newData = { ...res.data, messages: res.data.messages.reverse() };
     } catch (err) {
       dispatch({
         type: GLOBALTYPES.ALERT,

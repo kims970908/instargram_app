@@ -7,7 +7,11 @@ import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 import { imageUpload } from "../../utils/imageUpload";
 import Icons from "../Icons";
 import { videoShow, imageShow } from "../../utils/mediaShow";
-import { addMessage, getMessages } from "../../redux/actions/messageAction";
+import {
+  addMessage,
+  getMessages,
+  MESS_TYPES,
+} from "../../redux/actions/messageAction";
 import LoadIcon from "../../images/loading.gif";
 
 const RightSide = () => {
@@ -15,20 +19,26 @@ const RightSide = () => {
   const dispatch = useDispatch();
 
   const { id } = useParams();
+
   const [user, setUser] = useState([]);
   const [text, setText] = useState("");
   const [media, setMedia] = useState([]);
   const [loadMedia, setLoadMedia] = useState(false);
 
   const refDisplay = useRef();
+  const pageEnd = useRef();
+  const [page, setPage] = useState(0)
 
+  //유저 받아오기
   useEffect(() => {
     const newUser = message.users.find((user) => user._id === id);
     if (newUser) {
       setUser(newUser);
+      setPage(1)
     }
   }, [message.users, id]);
 
+  //파일 업로드
   const handleChangeMedia = (e) => {
     const files = [...e.target.files];
     let err = "";
@@ -36,23 +46,22 @@ const RightSide = () => {
 
     files.forEach((file) => {
       if (!file) return (err = "존재하지않는파일입니다");
-
       if (file.size > 1024 * 1024 * 5) {
         return (err = "파일이 너무 큽니다");
       }
-
       return newMedia.push(file);
     });
     if (err) dispatch({ type: GLOBALTYPES.ALERT, payload: { error: err } });
     setMedia([...media, ...newMedia]);
   };
-
+  //업로드 파일 삭제
   const handleDeleteMedia = (index) => {
     const newArr = [...media];
     newArr.splice(index, 1);
     setMedia(newArr);
   };
 
+  // 메세지 보내기
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!text.trim() && media.length === 0) return;
@@ -73,25 +82,66 @@ const RightSide = () => {
 
     setLoadMedia(false);
     await dispatch(addMessage({ msg, auth, socket }));
-    // if(refDisplay.current){
-    //     refDisplay.current.scrollIntoView({behavior: 'smooth', block: 'end'})
-    // }
+
+    if (refDisplay.current) {
+      refDisplay.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
   };
 
+  //메세지 받아오기
+  useEffect(() => {
+    if (id) {
+      const getMessagesData = async () => {
+        dispatch({ type: MESS_TYPES.GET_MESSAGES, payload: { messages: [] } });
+        await dispatch(getMessages({ auth, id }));
+        if (refDisplay.current) {
+          refDisplay.current.scrollIntoView({
+            behavior: "smooth",
+            block: "end",
+          });
+        }
+      };
+      getMessagesData();
+    }
+  }, [auth, dispatch, id]);
+
+  //더보기
+  useEffect(()=>{
+    const observer = new IntersectionObserver(entries =>{
+      if(entries[0].isIntersecting){
+        setPage(p => p +1)
+      }
+    }, {
+      threshold: 0.1
+    })
+    observer.observe(pageEnd.current)
+  },[setPage])
+
+  // 더보기 datapage 제한생성
+  useEffect(() =>{
+    if(message.resultData >= (page -1) *9 && page >1){
+      dispatch(getMessages({auth,id,page}))
+    }
+  },[message.resultData, page, id ,auth, dispatch])
+
+  //refDisplay scroll Smooth Impact
+  useEffect(()=>{
+    if (refDisplay.current) {
+      refDisplay.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  },[text])
+  
   const handleAudioCall = () => {};
 
   const handleVideoCall = () => {};
 
   const handleDeleteConversation = () => {};
-
-  useEffect(() => {
-    if (id) {
-      const getMessageData = async () => {
-        await dispatch(getMessages({ auth, id }));
-      };
-      getMessageData();
-    }
-  }, [id, dispatch, auth]);
 
   return (
     <>
@@ -116,7 +166,8 @@ const RightSide = () => {
         className="chat_container"
         style={{ height: media.length > 0 ? "calc(100% - 180px)" : "" }}
       >
-        <div className="chat_display">
+        <div className="chat_display" ref={refDisplay}>
+          <button style={{marginTop:'-25px', opacity:0}} ref={pageEnd}>더보기</button>
           {message.data.map((msg, index) => (
             <div key={index}>
               {msg.sender !== auth.user._id && (
