@@ -1,3 +1,4 @@
+const { json } = require("express/lib/response");
 const Conversations = require("../models/conversationModel");
 const Messages = require("../models/messageModel");
 
@@ -92,6 +93,32 @@ const messageCtrl = {
         messages,
         result: messages.length,
       });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  deleteMessages: async (req, res) => {
+    try {
+      await Messages.findOneAndDelete({
+        _id: req.params.id,
+        sender: req.user._id,
+      });
+      res.json({ msg: "삭제완료" });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  deleteConversation: async (req, res) => {
+    try {
+      const newConver = await Conversations.findOneAndDelete({
+        $or: [
+          { recipients: [req.user._id, req.params.id] },
+          { recipients: [req.params.id, req.user._id] },
+        ],
+      });
+      await Messages.deleteMany({ conversation: newConver._id });
+
+      res.json({ msg: "삭제완료" });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import UserCard from "../UserCard";
 import { useSelector, useDispatch } from "react-redux";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 import { getDataAPI } from "../../utils/fetchData";
 import { useHistory, useParams } from "react-router-dom";
-import { addUser, getConversations } from "../../redux/actions/messageAction";
+import { MESS_TYPES, getConversations } from "../../redux/actions/messageAction";
 
 const LeftSide = () => {
   const { auth, message } = useSelector((state) => state);
@@ -16,7 +16,9 @@ const LeftSide = () => {
   const dispatch = useDispatch();
 
   const history = useHistory();
-
+  
+  const pageEnd = useRef()
+  const [page, setPage] = useState(0)
   // 유저 검색
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ const LeftSide = () => {
   const handleAddUser = (user) => {
     setSearch("");
     setSearchUsers([]);
-    dispatch(addUser({ user, message }));
+    dispatch({ type: MESS_TYPES.ADD_USER, payload: user });
     return history.push(`/message/${user._id}`);
   };
 
@@ -50,6 +52,25 @@ const LeftSide = () => {
     if (message.firstLoad) return;
     dispatch(getConversations({ auth }));
   }, [dispatch, auth, message.firstLoad]);
+
+  //setPage 생성
+  useEffect(()=>{
+    const observer = new IntersectionObserver(entries =>{
+      if(entries[0].isIntersecting){
+        setPage(p => p +1)
+      }
+    }, {
+      threshold: 0.1
+    })
+    observer.observe(pageEnd.current)
+  },[setPage])
+
+  // endpage시 작동
+  useEffect(() =>{
+    if(message.resultUsers >= (page -1) *9 && page >1){
+      dispatch(getConversations({auth,page}))
+    }
+  },[message.resultUsers, page ,auth, dispatch])
 
   return (
     <>
@@ -93,6 +114,7 @@ const LeftSide = () => {
             ))}
           </>
         )}
+        <button ref={pageEnd} style={{opacity:0}}>더보기</button>
       </div>
     </>
   );

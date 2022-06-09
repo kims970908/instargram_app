@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import UserCard from "../UserCard";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import MsgDisplay from "./MsgDisplay";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 import { imageUpload } from "../../utils/imageUpload";
@@ -10,7 +10,8 @@ import { videoShow, imageShow } from "../../utils/mediaShow";
 import {
   addMessage,
   getMessages,
-  MESS_TYPES,
+  loadMoreMessages,
+  deleteConversation,
 } from "../../redux/actions/messageAction";
 import LoadIcon from "../../images/loading.gif";
 
@@ -27,14 +28,32 @@ const RightSide = () => {
 
   const refDisplay = useRef();
   const pageEnd = useRef();
-  const [page, setPage] = useState(0)
+  const history = useHistory();
+
+  const [data, setData] = useState([]);
+  const [result, setResult] = useState(9);
+  const [page, setPage] = useState(0);
+  const [isLoadMore, setIsLoadMore] = useState(0);
+
+  useEffect(() => {
+    const newData = message.data.find((item) => item._id === id);
+    if (newData) {
+      setData(newData.messages);
+      setResult(newData.result);
+      setPage(newData.page);
+    }
+  }, [message.data, id]);
 
   //유저 받아오기
   useEffect(() => {
-    const newUser = message.users.find((user) => user._id === id);
-    if (newUser) {
-      setUser(newUser);
-      setPage(1)
+    if (id && message.users.length > 0) {
+      setTimeout(() => {
+        refDisplay.current.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, 50);
+      const newUser = message.users.find((user) => user._id === id);
+      if (newUser) {
+        setUser(newUser);
+      }
     }
   }, [message.users, id]);
 
@@ -93,55 +112,58 @@ const RightSide = () => {
 
   //메세지 받아오기
   useEffect(() => {
-    if (id) {
-      const getMessagesData = async () => {
-        dispatch({ type: MESS_TYPES.GET_MESSAGES, payload: { messages: [] } });
+    const getMessagesData = async () => {
+      if (message.data.every((item) => item._id !== id)) {
         await dispatch(getMessages({ auth, id }));
-        if (refDisplay.current) {
+        setTimeout(() => {
           refDisplay.current.scrollIntoView({
             behavior: "smooth",
             block: "end",
           });
-        }
-      };
-      getMessagesData();
-    }
-  }, [auth, dispatch, id]);
-
-  //더보기
-  useEffect(()=>{
-    const observer = new IntersectionObserver(entries =>{
-      if(entries[0].isIntersecting){
-        setPage(p => p +1)
+        }, 50);
       }
-    }, {
-      threshold: 0.1
-    })
-    observer.observe(pageEnd.current)
-  },[setPage])
+    };
+    getMessagesData();
+  }, [id, dispatch, auth, message, data]);
 
-  // 더보기 datapage 제한생성
-  useEffect(() =>{
-    if(message.resultData >= (page -1) *9 && page >1){
-      dispatch(getMessages({auth,id,page}))
-    }
-  },[message.resultData, page, id ,auth, dispatch])
+  //setPage 생성
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsLoadMore((p) => p + 1);
+        }
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+    observer.observe(pageEnd.current);
+  }, [setIsLoadMore]);
 
-  //refDisplay scroll Smooth Impact
-  useEffect(()=>{
-    if (refDisplay.current) {
-      refDisplay.current.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-      });
+  // // endpage시 작동
+  useEffect(() => {
+    if (isLoadMore > 1) {
+      if (result >= page * 9) {
+        dispatch(loadMoreMessages({ auth, id, page: page + 1 }));
+        setIsLoadMore(1);
+      }
     }
-  },[text])
-  
+    // eslint-disable-next-line
+  }, [isLoadMore]);
+
+  //메세지 창 삭제
+  const handleDeleteConversation = () => {
+    if(window.confirm('메세지 방을 지우겠습니까?'))
+    dispatch(deleteConversation({auth, id}))
+    return history.push('/message')
+  };
+
   const handleAudioCall = () => {};
 
   const handleVideoCall = () => {};
 
-  const handleDeleteConversation = () => {};
+
 
   return (
     <>
@@ -155,7 +177,7 @@ const RightSide = () => {
 
               <i
                 className="fas fa-trash text-danger"
-                onClick={handleDeleteConversation}
+                onClick={()=>handleDeleteConversation(user)}
               />
             </div>
           </UserCard>
@@ -167,8 +189,10 @@ const RightSide = () => {
         style={{ height: media.length > 0 ? "calc(100% - 180px)" : "" }}
       >
         <div className="chat_display" ref={refDisplay}>
-          <button style={{marginTop:'-25px', opacity:0}} ref={pageEnd}>더보기</button>
-          {message.data.map((msg, index) => (
+          <button style={{ marginTop: "-25px", opacity: 0 }} ref={pageEnd}>
+            더보기
+          </button>
+          {data.map((msg, index) => (
             <div key={index}>
               {msg.sender !== auth.user._id && (
                 <div className="chat_row other_message">
@@ -177,7 +201,7 @@ const RightSide = () => {
               )}
               {msg.sender === auth.user._id && (
                 <div className="chat_row you_message">
-                  <MsgDisplay user={auth.user} msg={msg} theme={theme} />
+                  <MsgDisplay user={auth.user} msg={msg} theme={theme} data={data} />
                 </div>
               )}
             </div>
