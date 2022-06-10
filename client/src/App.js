@@ -68,7 +68,7 @@ function App() {
       port: "3001",
     });
     dispatch({ type: GLOBALTYPES.PEER, payload: newPeer });
-  }, []);
+  }, [dispatch]);
 
   return (
     <BrowserRouter>

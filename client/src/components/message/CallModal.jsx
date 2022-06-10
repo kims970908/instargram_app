@@ -4,7 +4,7 @@ import Avatar from "../Avatar";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
 
 const CallModal = () => {
-  const { call } = useSelector((state) => state);
+  const { call, auth, peer, socket } = useSelector((state) => state);
   const dispatch = useDispatch();
 
   const [mins, setMins] = useState(0);
@@ -38,10 +38,20 @@ const CallModal = () => {
     }
   }, [dispatch, answer]);
 
+
+  useEffect(()=>{
+    socket.on('endCallToClient', data=>{
+      dispatch({type: GLOBALTYPES.CALL, payload:null})
+    })
+    return ()=> socket.off('endCallToClient')
+  },[socket, dispatch])
+
   //통화 종료
   const handleEndCall = () => {
     dispatch({ type: GLOBALTYPES.CALL, payload: null });
+    socket.emit('endCall', call)
   };
+
   const handleAnswer = () => {
     setAnswer(true);
   };
@@ -55,9 +65,19 @@ const CallModal = () => {
           <h4>{call.username}</h4>
           <h6>{call.fullname}</h6>
 
-          <div>
-            {call.video ? <span>call Video</span> : <span>call audio</span>}
-          </div>
+          {answer ? (
+            <div>
+              <span>{mins.toString().length < 2 ? "0" + mins : mins}</span>
+              <span>:</span>
+              <span>
+                {second.toString().length < 2 ? "0" + second : second}
+              </span>
+            </div>
+          ) : (
+            <div>
+              {call.video ? <span>call Video</span> : <span>call audio</span>}
+            </div>
+          )}
         </div>
         <div className="timer">
           <small>{mins.toString().length < 2 ? "0" + mins : mins}</small>
@@ -68,23 +88,25 @@ const CallModal = () => {
           <span className="material-icons text-danger" onClick={handleEndCall}>
             call_end
           </span>
-          <>
-            {call.video ? (
-              <span
-                className="material-icons text-success"
-                onClick={handleAnswer}
-              >
-                videocam
-              </span>
-            ) : (
-              <span
-                className="material-icons text-success"
-                onClick={handleAnswer}
-              >
-                call
-              </span>
-            )}
-          </>
+          {call.recipient === auth.user._id && !answer && (
+            <>
+              {call.video ? (
+                <span
+                  className="material-icons text-success"
+                  onClick={handleAnswer}
+                >
+                  videocam
+                </span>
+              ) : (
+                <span
+                  className="material-icons text-success"
+                  onClick={handleAnswer}
+                >
+                  call
+                </span>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
