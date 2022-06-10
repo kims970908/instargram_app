@@ -8,7 +8,7 @@ import { MESS_TYPES } from "./redux/actions/messageAction";
 import audiobell from "./audio/got-it-done-613.mp3";
 
 const SocketClient = () => {
-  const { auth, socket, notify } = useSelector((state) => state);
+  const { auth, socket, notify, online } = useSelector((state) => state);
   const dispatch = useDispatch();
 
   const audioRef = useRef();
@@ -27,8 +27,8 @@ const SocketClient = () => {
   };
   //connect User
   useEffect(() => {
-    socket.emit("joinUser", auth.user._id);
-  }, [socket, auth.user._id]);
+    socket.emit("joinUser", auth.user);
+  }, [socket, auth.user]);
 
   // like
   useEffect(() => {
@@ -137,7 +137,41 @@ const SocketClient = () => {
   }, [socket, dispatch]);
 
   // user On/Offline 생성
-  useEffect(() => {}, [socket, dispatch]);
+  useEffect(() => {
+    socket.emit("checkUserOnline", auth.user);
+  }, [socket, auth.user]);
+
+  useEffect(() => {
+    socket.on("checkUserOnlineToMe", (data) => {
+      data.forEach((item) => {
+        if (!online.includes(item.id)) {
+          dispatch({ type: GLOBALTYPES.ONLINE, payload: item.id });
+        }
+      });
+    });
+
+    return () => socket.off("checkUserOnlineToMe");
+  }, [socket, dispatch, online]);
+
+  //OnlieToClient
+  useEffect(() => {
+    socket.on("checkUserOnlineToClient", (id) => {
+      if (!online.includes(id)) {
+        dispatch({ type: GLOBALTYPES.ONLINE, payload: id });
+      }
+    });
+
+    return () => socket.off("checkUserOnlineToClient");
+  }, [socket, dispatch, online]);
+
+  //Check user Offline
+  useEffect(() => {
+    socket.on("CheckUserOffline", (id) => {
+      dispatch({ type: GLOBALTYPES.OFFLINE, payload: id });
+    });
+
+    return () => socket.off("CheckUserOffline");
+  }, [socket, dispatch]);
 
   return (
     <>

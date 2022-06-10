@@ -97,7 +97,11 @@ const authCtrl = {
       //populate =>  필드가 null값일
       const user = await Users.findOne({
         email,
-      }).populate("followers following", "-password");
+        //-password
+      }).populate(
+        "followers following",
+        "avatar username fullname followers following"
+      );
 
       if (!user)
         return res.status(400).json({

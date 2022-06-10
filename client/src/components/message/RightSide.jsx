@@ -154,16 +154,32 @@ const RightSide = () => {
 
   //메세지 창 삭제
   const handleDeleteConversation = () => {
-    if(window.confirm('메세지 방을 지우겠습니까?'))
-    dispatch(deleteConversation({auth, id}))
-    return history.push('/message')
+    if (window.confirm("메세지 방을 지우겠습니까?")) {
+      dispatch(deleteConversation({ auth, id }));
+      return history.push("/message");
+    }
   };
 
-  const handleAudioCall = () => {};
+  const caller = ({ video }) => {
+    const { _id, avatar, username, fullname } = user;
+    const msg = {
+      sender: auth.user._id,
+      recipient: _id,
+      avatar,
+      username,
+      fullname,
+      video,
+    };
+    dispatch({ type: GLOBALTYPES.CALL, payload: msg });
+  };
 
-  const handleVideoCall = () => {};
+  const handleAudioCall = () => {
+    caller({ video: false });
+  };
 
-
+  const handleVideoCall = () => {
+    caller({ video: true });
+  };
 
   return (
     <>
@@ -177,7 +193,7 @@ const RightSide = () => {
 
               <i
                 className="fas fa-trash text-danger"
-                onClick={()=>handleDeleteConversation(user)}
+                onClick={handleDeleteConversation}
               />
             </div>
           </UserCard>
@@ -201,7 +217,12 @@ const RightSide = () => {
               )}
               {msg.sender === auth.user._id && (
                 <div className="chat_row you_message">
-                  <MsgDisplay user={auth.user} msg={msg} theme={theme} data={data} />
+                  <MsgDisplay
+                    user={auth.user}
+                    msg={msg}
+                    theme={theme}
+                    data={data}
+                  />
                 </div>
               )}
             </div>

@@ -4,16 +4,16 @@ import { imageShow, videoShow } from "../../utils/mediaShow";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteMessages } from "../../redux/actions/messageAction";
 
-
 const MsgDisplay = ({ user, msg, theme, data }) => {
   const { auth } = useSelector((state) => state);
   const dispatch = useDispatch();
 
-  const handleDeleteMessages = ()=>{
-    if(data){
-      dispatch(deleteMessages({msg, data, auth}))
+  const handleDeleteMessages = () => {
+    if (!data) return;
+    if (window.confirm("삭제하시겠습니까?")) {
+      dispatch(deleteMessages({ msg, data, auth }));
     }
-  }
+  };
   return (
     <>
       <div className="chat_title">
@@ -22,9 +22,11 @@ const MsgDisplay = ({ user, msg, theme, data }) => {
       </div>
 
       <div className="you_content">
-        {
-        user._id === auth.user._id && (
-          <i className="fas fa-trash text-danger" onClick={handleDeleteMessages} />
+        {user._id === auth.user._id && (
+          <i
+            className="fas fa-trash text-danger"
+            onClick={handleDeleteMessages}
+          />
         )}
         <div>
           {msg.text && (
