@@ -75,6 +75,10 @@ img{
 /* ----------ICONS CSS 추가----------- */
 @import url(./icons.css);
 
+/* ----------CALL CSS 추가----------- */
+@import url(./call_modal.css);
+
+
 .mode{
   width: 100%;
   height: 100vh;
