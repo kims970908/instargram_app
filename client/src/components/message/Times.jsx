@@ -18,8 +18,8 @@ const Times = ({total}) => {
       <span>
         {
           (total%60).toString().length < 2
-          ?'0' + (total%60) + 's'
-          : (total%60) + 's'
+          ?'0' + (total%60) + '초'
+          : (total%60) + '초'
         }
       </span>
     </div>

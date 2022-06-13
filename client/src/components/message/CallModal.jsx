@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Avatar from "../Avatar";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
-// import { addMessage } from "../../redux/actions/messageAction";
-import Dophine from "../../audio/dophin_bell.wav";
+import { addMessage } from "../../redux/actions/messageAction";
+import Dophine from "../../audio/alram_bell.mp3";
 
 const CallModal = () => {
   const { call, auth, peer, socket, theme } = useSelector((state) => state);
@@ -37,36 +37,54 @@ const CallModal = () => {
     setHours(parseInt(total / 3600));
   }, [total]);
 
+  // CallMessage추가
+  const addCallMessage = useCallback(
+    (call, times, disconnect) => {
+      if (call.recipient !== auth.user._id || disconnect) {
+        const msg = {
+          sender: call.sender,
+          recipient: call.recipient,
+          text: "",
+          media: [],
+          call: { video: call.video, times },
+          createdAt: new Date().toISOString(),
+        };
+        dispatch(addMessage({ msg, auth, socket }));
+      }
+    },
+    [auth, dispatch, socket]
+  );
+
+  //통화 종료
+  const handleEndCall = () => {
+    tracks && tracks.forEach((track) => track.stop());
+    let times = answer ? total : 0;
+    socket.emit("endCall", { ...call, times });
+    addCallMessage(call, times);
+    dispatch({ type: GLOBALTYPES.CALL, payload: null });
+  };
+
   useEffect(() => {
     if (answer) {
       setTotal(0);
     } else {
       const timer = setTimeout(() => {
-        tracks && tracks.forEach((track) => track.stop());
-
-        socket.emit("endCall", call);
+        socket.emit("endCall", { ...call, times: 0 });
+        addCallMessage(call, 0);
         dispatch({ type: GLOBALTYPES.CALL, payload: null });
       }, 15000);
       return () => clearTimeout(timer);
     }
-  }, [dispatch, answer, call, socket, tracks]);
-
-  //통화 종료
-  const handleEndCall = () => {
-    tracks && tracks.forEach((track) => track.stop());
-
-    socket.emit("endCall", call);
-    dispatch({ type: GLOBALTYPES.CALL, payload: null });
-  };
+  }, [dispatch, answer, call, socket, addCallMessage]);
 
   useEffect(() => {
     socket.on("endCallToClient", (data) => {
       tracks && tracks.forEach((track) => track.stop());
-
+      addCallMessage(data, data.times);
       dispatch({ type: GLOBALTYPES.CALL, payload: null });
     });
     return () => socket.off("endCallToClient");
-  }, [socket, dispatch, tracks]);
+  }, [socket, dispatch, tracks, addCallMessage]);
 
   //peerjs에서 참고
   // Stream Media
@@ -81,6 +99,7 @@ const CallModal = () => {
     video.play();
   };
 
+  // Answer Call
   const handleAnswer = () => {
     openStream(call.video).then((stream) => {
       playStream(myVideo.current, stream);
@@ -92,6 +111,7 @@ const CallModal = () => {
         playStream(otherVideo.current, remoteStream);
       });
       setAnswer(true);
+      setNewCall(newCall);
     });
   };
 
@@ -107,21 +127,32 @@ const CallModal = () => {
         newCall.answer(stream);
         newCall.on("stream", function (remoteStream) {
           if (otherVideo.current) {
-            playStream(openStream.current, remoteStream);
+            playStream(otherVideo.current, remoteStream);
           }
         });
         setAnswer(true);
+        setNewCall(newCall);
       });
     });
     return () => peer.removeListener("call");
   }, [peer, call.video]);
 
   // callerDisConnect
-  // useEffect(() => {
-  //   socket.on("callerDisconnect", () => {});
-  // });
+  useEffect(() => {
+    socket.on("callerDisconnect", () => {
+      tracks && tracks.forEach((track) => track.stop());
+      let times = answer ? total : 0;
+      addCallMessage(call, times, true);
+      dispatch({ type: GLOBALTYPES.CALL, payload: null });
+      dispatch({
+        type: GLOBALTYPES.ALERT,
+        payload: { error: `${call.fullname}님과 연결이 끊겼습니다` },
+      });
+    });
+    return () => socket.off("callerDisconnect");
+  }, [socket, tracks, dispatch, call, addCallMessage, answer, total]);
 
-  //통화음 자동반복 설정
+  //통화음 설정
   const playAudio = (newAudio) => {
     newAudio.play();
   };
@@ -135,6 +166,7 @@ const CallModal = () => {
   // 통화음 설정
   useEffect(() => {
     let newAudio = new Audio(Dophine);
+    newAudio.loop = true
     if (answer) {
       pauseAudio(newAudio);
     } else {
@@ -167,13 +199,7 @@ const CallModal = () => {
               </span>
             </div>
           ) : (
-            <div>
-              {call.video ? (
-                <span>calling video...</span>
-              ) : (
-                <span>calling audio...</span>
-              )}
-            </div>
+            <div>{call.video ? <span>통화중</span> : <span>통화중</span>}</div>
           )}
         </div>
 
@@ -224,7 +250,7 @@ const CallModal = () => {
           filter: theme ? "invert(1)" : "invert(0)",
         }}
       >
-        <video ref={myVideo} className="my_video" playsInline muted />
+        <video ref={myVideo} className="my_video" playsinline muted/>
         <video ref={otherVideo} className="other_video" playsInline />
 
         <div className="time_video">

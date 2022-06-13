@@ -13,13 +13,38 @@ const UserCard = ({
   setShowFollowing,
   msg,
 }) => {
+  const { theme } = useSelector((state) => state);
   const handleCloseAll = () => {
     if (handleClose) handleClose();
     if (setShowFollowers) setShowFollowers(false);
     if (setShowFollowing) setShowFollowing(false);
   };
 
-  const { theme } = useSelector((state) => state);
+  const showMsg = (user) => {
+    return (
+      <>
+        <div style={{ filter: theme ? "invert(1)" : "invert(0)" }}>
+          {user.text}
+        </div>
+        {user.media.length > 0 && (
+          <div>
+            {user.media.length} <i className="fas fa-image" />
+          </div>
+        )}
+        {user.call && (
+          <span className="material-icons">
+            {user.call.times === 0
+              ? user.call.video
+                ? "videocam_off"
+                : "phone_disabled"
+              : user.call.video
+              ? "video_camera_front"
+              : "call"}
+          </span>
+        )}
+      </>
+    );
+  };
   return (
     <div
       className={`d-flex p-2 align-items-center justify-content-between font-weight-${bold} ${border} w-100`}
@@ -34,23 +59,7 @@ const UserCard = ({
           <div className="ml-1" style={{ transform: "translateY(-2px)" }}>
             <span className="d-block">{user.username}</span>
             <small style={{ opacity: 0.7 }}>
-              {
-                user.text || user.media
-                ? (
-                  <>
-                    <div style={{ filter: theme ? "invert(1)" : "invert(0)" }}>
-                      {user.text}
-                    </div>
-                    {user.media.length > 0 && (
-                      <div>
-                        {user.media.length} <i className="fas fa-image" />
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  user.fullname
-                )
-              }
+              {user.text || user.media ? showMsg(user) : user.fullname}
             </small>
           </div>
         </Link>

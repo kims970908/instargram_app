@@ -31,14 +31,13 @@ const SocketServer = (socket) => {
           socket.to(`${client.socketId}`).emit("CheckUserOffline", data.id);
         });
       }
-
-      // if(data.call){
-      //   const callUser = users.find(user=> user.id === data.user)
-      //   if(callUser){
-      //     users= EditData(users, callUser.id, null);
-      //     socket.to(`${callUser.socketId}`),emit('callerDisconnect')
-      //   }
-      // }
+      if (data.call) {
+        const callUser = users.find((user) => user.id === data.call);
+        if (callUser) {
+          user = EditData(users, callUser.id, null);
+          socket.to(`${callUser.socketId}`).emit("callerDisconnect");
+        }
+      }
     }
     users = users.filter((user) => user.socketId !== socket.id);
   });
@@ -179,6 +178,7 @@ const SocketServer = (socket) => {
   });
 
   socket.on("endCall", (data) => {
+    // console.log(data);
     // console.log({ old: users });
     const client = users.find((user) => user.id === data.sender);
 
