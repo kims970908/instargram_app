@@ -1,17 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Avatar from "../Avatar";
 import { GLOBALTYPES } from "../../redux/actions/globalTypes";
+// import { addMessage } from "../../redux/actions/messageAction";
+import Dophine from "../../audio/dophin_bell.wav";
 
 const CallModal = () => {
-  const { call, auth, peer, socket } = useSelector((state) => state);
+  const { call, auth, peer, socket, theme } = useSelector((state) => state);
   const dispatch = useDispatch();
 
+  const [hours, setHours] = useState(0);
   const [mins, setMins] = useState(0);
   const [second, setSecond] = useState(0);
   const [total, setTotal] = useState(0);
-  const [answer, setAnswer] = useState(false);
 
+  const [answer, setAnswer] = useState(false);
+  const myVideo = useRef();
+  const otherVideo = useRef();
+  const [tracks, setTracks] = useState(null);
+  const [newCall, setNewCall] = useState(null);
+
+  //setTime
   useEffect(() => {
     const setTime = () => {
       setTotal((t) => t + 1);
@@ -21,10 +30,11 @@ const CallModal = () => {
 
     return () => setTotal(0);
   }, []);
-
+  //setTime
   useEffect(() => {
     setSecond(total % 60);
     setMins(parseInt(total / 60));
+    setHours(parseInt(total / 3600));
   }, [total]);
 
   useEffect(() => {
@@ -32,41 +42,124 @@ const CallModal = () => {
       setTotal(0);
     } else {
       const timer = setTimeout(() => {
+        tracks && tracks.forEach((track) => track.stop());
+
+        socket.emit("endCall", call);
         dispatch({ type: GLOBALTYPES.CALL, payload: null });
       }, 15000);
       return () => clearTimeout(timer);
     }
-  }, [dispatch, answer]);
-
-
-  useEffect(()=>{
-    socket.on('endCallToClient', data=>{
-      dispatch({type: GLOBALTYPES.CALL, payload:null})
-    })
-    return ()=> socket.off('endCallToClient')
-  },[socket, dispatch])
+  }, [dispatch, answer, call, socket, tracks]);
 
   //통화 종료
   const handleEndCall = () => {
+    tracks && tracks.forEach((track) => track.stop());
+
+    socket.emit("endCall", call);
     dispatch({ type: GLOBALTYPES.CALL, payload: null });
-    socket.emit('endCall', call)
+  };
+
+  useEffect(() => {
+    socket.on("endCallToClient", (data) => {
+      tracks && tracks.forEach((track) => track.stop());
+
+      dispatch({ type: GLOBALTYPES.CALL, payload: null });
+    });
+    return () => socket.off("endCallToClient");
+  }, [socket, dispatch, tracks]);
+
+  //peerjs에서 참고
+  // Stream Media
+  const openStream = (video) => {
+    const config = { audio: true, video };
+    return navigator.mediaDevices.getUserMedia(config);
+  };
+
+  const playStream = (tag, stream) => {
+    let video = tag;
+    video.srcObject = stream;
+    video.play();
   };
 
   const handleAnswer = () => {
-    setAnswer(true);
+    openStream(call.video).then((stream) => {
+      playStream(myVideo.current, stream);
+      const track = stream.getTracks();
+      setTracks(track);
+
+      const newCall = peer.call(call.peerId, stream);
+      newCall.on("stream", function (remoteStream) {
+        playStream(otherVideo.current, remoteStream);
+      });
+      setAnswer(true);
+    });
   };
+
+  useEffect(() => {
+    peer.on("call", (newCall) => {
+      openStream(call.video).then((stream) => {
+        if (myVideo.current) {
+          playStream(myVideo.current, stream);
+        }
+        const track = stream.getTracks();
+        setTracks(track);
+
+        newCall.answer(stream);
+        newCall.on("stream", function (remoteStream) {
+          if (otherVideo.current) {
+            playStream(openStream.current, remoteStream);
+          }
+        });
+        setAnswer(true);
+      });
+    });
+    return () => peer.removeListener("call");
+  }, [peer, call.video]);
+
+  // callerDisConnect
+  // useEffect(() => {
+  //   socket.on("callerDisconnect", () => {});
+  // });
+
+  //통화음 자동반복 설정
+  const playAudio = (newAudio) => {
+    newAudio.play();
+  };
+
+  //통화음 멈춤 설정
+  const pauseAudio = (newAudio) => {
+    newAudio.pause();
+    newAudio.currentTime = 0;
+  };
+
+  // 통화음 설정
+  useEffect(() => {
+    let newAudio = new Audio(Dophine);
+    if (answer) {
+      pauseAudio(newAudio);
+    } else {
+      playAudio(newAudio);
+    }
+    return () => pauseAudio(newAudio);
+  }, [answer]);
 
   return (
     <div className="call_modal">
-      <div className="call_box">
-        {/* style={{padding: "40px 0"}} */}
-        <div className="text-center">
+      <div
+        className="call_box"
+        style={{
+          display: answer && call.video ? "none" : "flex",
+        }}
+      >
+        <div className="text-center" style={{ padding: "40px 0" }}>
           <Avatar src={call.avatar} size="supper-avatar" />
           <h4>{call.username}</h4>
           <h6>{call.fullname}</h6>
 
           {answer ? (
             <div>
+              <span>{hours.toString().length < 2 ? "0" + hours : hours}</span>
+              <span>:</span>
               <span>{mins.toString().length < 2 ? "0" + mins : mins}</span>
               <span>:</span>
               <span>
@@ -75,39 +168,79 @@ const CallModal = () => {
             </div>
           ) : (
             <div>
-              {call.video ? <span>call Video</span> : <span>call audio</span>}
+              {call.video ? (
+                <span>calling video...</span>
+              ) : (
+                <span>calling audio...</span>
+              )}
             </div>
           )}
         </div>
-        <div className="timer">
-          <small>{mins.toString().length < 2 ? "0" + mins : mins}</small>
-          <small>:</small>
-          <small>{second.toString().length < 2 ? "0" + second : second}</small>
-        </div>
+
+        {!answer && (
+          <div className="timer">
+            <small>{mins.toString().length < 2 ? "0" + mins : mins}</small>
+            <small>:</small>
+            <small>
+              {second.toString().length < 2 ? "0" + second : second}
+            </small>
+          </div>
+        )}
+
         <div className="call_menu">
-          <span className="material-icons text-danger" onClick={handleEndCall}>
+          <button
+            className="material-icons text-danger"
+            onClick={handleEndCall}
+          >
             call_end
-          </span>
+          </button>
+
           {call.recipient === auth.user._id && !answer && (
             <>
               {call.video ? (
-                <span
+                <button
                   className="material-icons text-success"
                   onClick={handleAnswer}
                 >
                   videocam
-                </span>
+                </button>
               ) : (
-                <span
+                <button
                   className="material-icons text-success"
                   onClick={handleAnswer}
                 >
                   call
-                </span>
+                </button>
               )}
             </>
           )}
         </div>
+      </div>
+
+      <div
+        className="show_video"
+        style={{
+          opacity: answer && call.video ? "1" : "0",
+          filter: theme ? "invert(1)" : "invert(0)",
+        }}
+      >
+        <video ref={myVideo} className="my_video" playsInline muted />
+        <video ref={otherVideo} className="other_video" playsInline />
+
+        <div className="time_video">
+          <span>{hours.toString().length < 2 ? "0" + hours : hours}</span>
+          <span>:</span>
+          <span>{mins.toString().length < 2 ? "0" + mins : mins}</span>
+          <span>:</span>
+          <span>{second.toString().length < 2 ? "0" + second : second}</span>
+        </div>
+
+        <button
+          className="material-icons text-danger end_call"
+          onClick={handleEndCall}
+        >
+          call_end
+        </button>
       </div>
     </div>
   );
