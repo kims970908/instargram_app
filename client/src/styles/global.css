@@ -1,0 +1,122 @@
+* {
+  padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+#theme {
+  display: none;
+}
+#theme:checked ~ * {
+  filter: invert(1);
+}
+
+.App {
+  width: 100%;
+  min-height: 100vh;
+  background: white;
+}
+
+.main{
+  max-width: 1000px;
+  width: 100%;
+  margin:auto;
+}
+
+img{
+  object-fit: cover
+}
+
+
+/* ----------AUTH CSS 추가----------- */
+@import url(./auth.css);
+
+/* ----------LOADING CSS 추가----------- */
+@import url(./loading.css);
+
+/* ----------HEADER CSS 추가----------- */
+@import url(./header.css);
+
+/* ----------AVAVAR CSS 추가----------- */
+@import url(./avatar.css);
+
+/* ----------PROFILE CSS 추가----------- */
+@import url(./profile.css);
+
+/* ----------HOME CSS 추가----------- */
+@import url(./home.css);
+
+/* ----------STATUS_MODAL CSS 추가----------- */
+@import url(./status_modal.css);
+
+/* ----------COMMENT CSS 추가----------- */
+@import url(./comments.css);
+
+/* ----------POST THUMB CSS 추가----------- */
+@import url(./post_thumb.css);
+
+/* ----------MESSAGE CSS 추가----------- */
+@import url(./message.css);
+
+/* ----------ICONS CSS 추가----------- */
+@import url(./icons.css);
+
+/* ----------CALL CSS 추가----------- */
+@import url(./call_modal.css);
+
+
+.mode{
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+/* -------------------media max-width: 768px--------------------- */
+@media (max-width: 766px){
+  .header .navbar .logo{
+    display: none;
+  }
+  .header .menu{
+      width: 100%;
+      height: 40px;
+  }
+  .header .menu .navbar-nav{
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+  }
+  
+  .header .search_form{
+      width: 100%;
+  }
+  .header .logo{
+      margin: auto;
+  }
+  .header .logo h1{
+      font-size: 1.5rem;
+  }
+  
+  .message{
+    height: calc(100vh - 100px);
+  }
+  .right_mess,
+  .left_mess{
+    display: none;
+  }
+  .status{
+    padding: 20px 10px;
+  }
+}
