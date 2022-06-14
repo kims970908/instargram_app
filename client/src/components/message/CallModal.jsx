@@ -58,6 +58,7 @@ const CallModal = () => {
   //통화 종료
   const handleEndCall = () => {
     tracks && tracks.forEach((track) => track.stop());
+    if(newCall) newCall.close()
     let times = answer ? total : 0;
     socket.emit("endCall", { ...call, times });
     addCallMessage(call, times);
@@ -80,11 +81,12 @@ const CallModal = () => {
   useEffect(() => {
     socket.on("endCallToClient", (data) => {
       tracks && tracks.forEach((track) => track.stop());
+      if(newCall) newCall.close()
       addCallMessage(data, data.times);
       dispatch({ type: GLOBALTYPES.CALL, payload: null });
     });
     return () => socket.off("endCallToClient");
-  }, [socket, dispatch, tracks, addCallMessage]);
+  }, [socket, dispatch, tracks, addCallMessage, newCall]);
 
   //peerjs에서 참고
   // Stream Media
@@ -141,6 +143,7 @@ const CallModal = () => {
   useEffect(() => {
     socket.on("callerDisconnect", () => {
       tracks && tracks.forEach((track) => track.stop());
+      if(newCall) newCall.close()
       let times = answer ? total : 0;
       addCallMessage(call, times, true);
       dispatch({ type: GLOBALTYPES.CALL, payload: null });
@@ -150,7 +153,7 @@ const CallModal = () => {
       });
     });
     return () => socket.off("callerDisconnect");
-  }, [socket, tracks, dispatch, call, addCallMessage, answer, total]);
+  }, [socket, tracks, dispatch, call, addCallMessage, answer, total, newCall]);
 
   //통화음 설정
   const playAudio = (newAudio) => {

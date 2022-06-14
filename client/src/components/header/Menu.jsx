@@ -78,7 +78,7 @@ const Menu = () => {
               프로필
             </Link>
 
-            <label
+            {/* <label
               htmlFor="theme"
               className="dropdown-item"
               onClick={() =>
@@ -89,7 +89,7 @@ const Menu = () => {
               }
             >
               {theme ? "Light mode" : "Dark mode"}
-            </label>
+            </label> */}
 
             <div className="dropdown-divider"></div>
             <Link

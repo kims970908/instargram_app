@@ -5,7 +5,7 @@ import { NOTIFY_TYPES } from "./redux/actions/notifyAction";
 import { POST_TYPES } from "./redux/actions/postAction";
 import { MESS_TYPES } from "./redux/actions/messageAction";
 
-import audiobell from "./audio/got-it-done-613.mp3";
+import audiobell from "./audio/dophin_bell.wav";
 
 const SocketClient = () => {
   const { auth, socket, notify, online, call } = useSelector((state) => state);
