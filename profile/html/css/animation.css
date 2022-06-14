@@ -1,0 +1,73 @@
+.btn_move {
+  width: 100px;
+  height: 50px;
+  padding: 10px;
+  border: 1px solid #eee;
+  background-color: #63c8f7;
+  color: #eee;
+}
+
+.btn_move:hover {
+  animation-name: btn-mv;
+  animation-duration: .7s;
+  animation-iteration-count: infinite;
+}
+
+.icon_move:hover {
+  animation-name: icon-mv;
+  animation-iteration-count: infinite;
+  animation-duration: 1s; 
+}
+
+@keyframes btn-mv {
+  0% {
+    transform: translateX(0px);
+  }
+
+  20% {
+    transform: rotate(10deg);
+  }
+
+  40% {
+    transform: rotate(-10deg);
+  }
+
+  60% {
+    transform: rotate(10deg);
+  }
+
+  80% {
+    transform: rotate(-10deg);
+  }
+
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+@keyframes icon-mv {
+  0% {
+    transform: translateX(0px);
+  }
+
+  20% {
+    transform: rotate(-10deg);
+  }
+
+  40% {
+    transform: rotate(30deg);
+  }
+
+  60% {
+    transform: scale(2);
+  }
+
+  80% {
+    transform: rotate(-10deg);
+  }
+
+  100% {
+    transform: translateX(0px);
+  }
+}
+

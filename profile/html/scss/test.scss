@@ -1,0 +1,40 @@
+$maincolor : #2a4cb2;
+$servecolor : #eeeeee;
+$basic-size : 20px;
+
+@mixin font($size) {
+  font-size: $size;
+  letter-spacing: -1px;
+}
+
+%btn { 
+  width: 100px;
+  height: 100px;
+  padding: 20px;
+}
+
+.btn-green {
+  @extend %btn;
+  color: green;
+}
+
+.btn-red {
+  @extend %btn;
+  color: red;
+}
+
+.btn-blue {
+  @extend %btn;
+  color: blue;
+}
+
+
+.background {
+  background-color: #2a4cb2;
+  font-size: ($basic-size * 2);
+}
+
+.box {
+  color: $servecolor;
+  font-size: ($basic-size -2px);
+}

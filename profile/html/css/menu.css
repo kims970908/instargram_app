@@ -1,0 +1,28 @@
+.ani-navbar {
+  width: 10%;
+  background: black;
+  color: white;
+  height: 100%;
+  padding: 20px;
+  position: fixed;
+  text-align: right;
+  transition: all 1s;
+  transform: translateX(-150px);
+}
+
+.ani-navbar:hover {
+  transform: translateX(-30px);
+  text-align: center;
+}
+
+.ani-navbar:hover p {
+  animation-name: slide;
+  animation-duration: .7s;
+} 
+
+@keyframes slide {
+  0% { transform: translateX(-250px) }
+  50% { transform: translateX(50px) skewX(-30deg)}
+  100% { transform: translateX(0px) }
+}
+

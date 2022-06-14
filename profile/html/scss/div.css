@@ -1,0 +1,17 @@
+.div-green, .div-blue, .div-red {
+  width: 200px;
+  height: 200px;
+  padding: 20px;
+}
+
+.div-red {
+  background-color: red;
+}
+
+.div-blue {
+  background-color: blue;
+}
+
+.div-green {
+  background-color: green;
+}/*# sourceMappingURL=div.css.map */
