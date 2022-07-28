@@ -16,6 +16,7 @@
 | 서버 프레임워크 | <img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=Express&logoColor=white"/>  |
 | 프레임워크 | <img src="https://img.shields.io/badge/React-0088CC?style=flat-square&logo=React&logoColor=white"/> (Redux 프레임워크) |
 | 서버 사이드플랫폼 | <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=Node.js&logoColor=white"/> |
+| PAAS | <img src="https://img.shields.io/badge/Heroku-430098?style=flat-square&logo=Heroku&logoColor=white"/> |
 
 ### 📃라이브러리
 
@@ -53,3 +54,38 @@
 
 ```
 </div>
+
+## 페이지 소개
+
+
+### 로그인 페이지
+
+<div align=center>
+
+<img
+src="https://res.cloudinary.com/dlb43l9iy/image/upload/v1658983701/Social_media/escz07d5xy9tqumsnnou.png"
+width= 100%
+height=50%>
+</img>
+
+</div>
+
+```
+첫 로그인 시 웹 토근을 발급 받아서 
+```
+
+### 홈페이지
+
+<div align=center>
+
+<img
+src="https://res.cloudinary.com/dlb43l9iy/image/upload/v1658992536/Github_Readme/Home_page_wowme8.png"
+width=100%
+height=50%>
+</img>
+
+</div>
+
+```
+여러 게시물을 확인 가능하며 사이드 바에 팔로우 하지 않은 회원들을 확인 할 수 있습니다.
+```
