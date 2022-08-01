@@ -1,7 +1,7 @@
 
 
 # Social_Web
-> [💻SOCIAL 사이트 바로가기](https://social-web-prj.herokuapp.com/, "social-web")
+> [💻SOCIAL 사이트 바로가기](https://social-web-prj.herokuapp.com/ "social-web")
 
 ## 소개
 
